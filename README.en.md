@@ -4,7 +4,7 @@
 
 <img src="assets/TrackBridge-icon.png" width="96" alt="TrackBridge icon">
 
-**By Rub1nchik · Windows · 1.8.2 beta**
+**By Rub1nchik · Windows · 1.8.3 beta**
 
 TrackBridge connects a custom Twitch Channel Points reward to your Spotify queue. Viewers submit a song link, the app finds a matching Spotify track and adds it to the end of your queue without interrupting the current song.
 
@@ -47,12 +47,11 @@ Version 1.7 needs a one-time manual upgrade to 1.8 or later. Close the old app, 
 
 ## Beta limitations
 
-- **Yandex Music is no longer supported due to HTTP 451 access restrictions. The integration has been removed and will not be available in this beta.** Use Spotify, YouTube or YouTube Music links.
 - Matching may miss a song that exists in Spotify. Direct Spotify links are more reliable.
 - Songs are appended to the existing queue. Reward fulfillment confirms that Spotify accepted the queue request, not that the song played to completion.
 - If a Spotify response is lost, the request is marked **Check manually** instead of being resent. Inspect the Spotify queue and use the request's context menu to confirm or refund it.
 - Starting the app also recovers pending redemptions for the selected reward, including purchases made while the app was closed. Cancel unwanted redemptions in Twitch before starting.
-- Skip voting, OBS now-playing output and a clickable Twitch Extension are design proposals, not features in this release.
+- OBS now-playing output and a clickable Twitch Extension are not included in this release.
 
 ## Privacy and support
 
@@ -64,10 +63,16 @@ When reporting a problem, include the version, steps and sanitized log lines. Do
 
 By **Rub1nchik**. See [LICENSE.txt](LICENSE.txt) and [THIRD-PARTY-NOTICES.txt](THIRD-PARTY-NOTICES.txt). This repository contains public documentation and release materials only.
 
-TrackBridge controls your own Spotify player and does not grant broadcasting rights. Premium does not authorize streaming music to an audience. Follow [Spotify's policies](https://developer.spotify.com/policy) and Twitch's rules. TrackBridge is not affiliated with Spotify, Twitch, YouTube or Yandex. Paid access and donation features are not enabled.
+TrackBridge controls your own Spotify player and does not grant broadcasting rights. Premium does not authorize streaming music to an audience. Follow [Spotify's policies](https://developer.spotify.com/policy) and Twitch's rules. TrackBridge is not affiliated with Spotify, Twitch, YouTube. Paid access and donation features are not enabled.
 
 ## Queue and updater protections in 1.8.2
 
 The app retains up to 100 active requests, 500 completed history entries and 5000 recent receipt IDs. Each viewer can have up to three active requests. When the global queue is full, additional redemptions remain pending in Twitch until space becomes available. Temporary failures are deferred rather than blocking the queue; after three failed attempts a refund is requested. Failed Twitch finalization requires manual resolution.
 
 Future updates require a publisher-signed RSA/SHA-256 manifest verified against a pinned public key. For a trusted transition, install 1.8.2 manually from a trusted package: 1.8 and 1.8.1 cannot verify publisher signatures. This package signature is separate from Windows Authenticode code signing.
+
+## Chat commands
+
+- `!song` replies with the current Spotify track and link, with a shared 5-second reply cooldown.
+- `!voteskip` skips after votes from 5 different Twitch user IDs. Duplicate votes are ignored. Votes reset when the track changes or playback returns to the beginning. Skipping does not refund channel points.
+- Click Start and keep Spotify active. Reconnect Twitch once to grant permission to read and send chat messages.
