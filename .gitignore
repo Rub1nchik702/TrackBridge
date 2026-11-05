@@ -1,1 +1,15 @@
+# Only explicitly listed publication files may enter this repository.
+*
+!/.gitignore
+!/README.md
+!/README.en.md
+!/LICENSE.txt
+!/THIRD-PARTY-NOTICES.txt
+!/CHANGELOG.md
+!/assets/
+!/assets/TrackBridge-icon.png
+!/.github/
+!/.github/ISSUE_TEMPLATE/
+!/.github/ISSUE_TEMPLATE/bug_report.md
 
+# Executables belong in GitHub Release assets, not in Git history.
