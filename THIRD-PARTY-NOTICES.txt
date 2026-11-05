@@ -1,4 +1,4 @@
-TrackBridge 1.7.0-beta.1
+TrackBridge 1.8.0-beta.1
 Автор приложения: Rub1nchik.
 
 Исполняемый файл использует системные компоненты Microsoft .NET Framework и Windows. Эти компоненты не включены в архив и предоставляются на условиях их правообладателей.
@@ -27,4 +27,4 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-Spotify, Twitch, YouTube, Яндекс Музыка и связанные обозначения принадлежат их правообладателям. Упоминание названий не означает одобрения TrackBridge этими компаниями.
+Spotify, Twitch, YouTube и связанные обозначения принадлежат их правообладателям. Упоминание названий не означает одобрения TrackBridge этими компаниями.
