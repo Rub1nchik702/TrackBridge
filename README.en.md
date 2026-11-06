@@ -4,7 +4,7 @@
 
 <img src="assets/TrackBridge-icon.png" width="96" alt="TrackBridge icon">
 
-**By Rub1nchik · Windows · 1.9.0.1 beta**
+**By Rub1nchik · Windows · 1.9.0.1**
 
 TrackBridge connects a custom Twitch Channel Points reward to your Spotify queue. Viewers submit a song link, the app finds a matching Spotify track and adds it to the end of your queue without interrupting the current song.
 
@@ -47,15 +47,57 @@ Requires Windows 10/11, .NET Framework 4.7.2 or later, Spotify Premium and an ac
 
 ## Setup
 
-1. Create your own Web API app in the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard). Set the exact redirect URI to `http://127.0.0.1:43821/callback`.
-2. Paste its **Client ID** into TrackBridge, click **Connect Spotify** and authorize in your browser. No Client Secret is needed. If required, add your Spotify account to the developer app's allowed users.
-3. Register a **Public** app in the [Twitch Developer Console](https://dev.twitch.tv/console/apps). If a redirect URL is required, enter `http://localhost:43821`. Device Code Flow does not use this redirect.
-4. Paste the Twitch Client ID and click **Connect Twitch**. Authorize as the channel owner and allow chat messages for refund notifications.
-5. Create a reward through TrackBridge, or select one previously created using the same Twitch Client ID. Require text input and keep redemptions in the request queue.
-6. Open Spotify and start playback on your preferred device. Select the reward in TrackBridge and click **Start**.
-7. Wait for **Requests active · Twitch connected**, then submit a test request using that reward.
+Screenshots below show TrackBridge 1.9.0.1 with demonstration data. Replace the example Client IDs with your own; the images do not show real accounts or authorization tokens.
 
-Connecting accounts does not start request handling. Each broadcaster currently supplies their own developer application IDs.
+### 1. Open Settings
+
+Extract the entire Windows ZIP into a writable folder, run `TrackBridge.exe`, choose **EN** if needed, and open **Settings** in the sidebar.
+
+![Step 1 — open Settings](assets/setup-step-1-en.png)
+
+### 2. Register the developer apps and connect your accounts
+
+First open the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard), sign in, and create an app for your own account. Use these values:
+
+| Field | Value |
+| --- | --- |
+| App name | TrackBridge, or your own descriptive name |
+| App description | Personal desktop app that adds viewer song requests to my Spotify queue. |
+| Website | Your project URL, if the form requires one |
+| Redirect URI | `http://127.0.0.1:43821/callback` |
+| API | Web API |
+
+Save the app and copy its **Client ID**. In TrackBridge, paste it into **Spotify Client ID**, click **Connect Spotify**, and approve access in the browser. Keep TrackBridge open until the browser returns to its local callback. A Client Secret is not needed. Spotify Premium is required; if the developer dashboard requires an allowed-user entry, add the Spotify account you will connect. See [Spotify app setup](https://developer.spotify.com/documentation/web-api/concepts/apps) and [redirect URI requirements](https://developer.spotify.com/documentation/web-api/concepts/redirect_uri).
+
+Then open the [Twitch Developer Console](https://dev.twitch.tv/console/apps), sign in as the channel owner, and register an application:
+
+| Field | Value |
+| --- | --- |
+| Name | TrackBridge, or another available app name |
+| OAuth Redirect URL | `http://localhost:43821`, if required; click Add and save |
+| Category | An appropriate integration category, such as Application Integration if offered |
+| Client type | Public |
+
+Copy its **Client ID** into **Twitch Client ID**, click **Connect Twitch**, and follow the browser instructions to authorize the channel owner's account. Allow the requested chat access so song replies and refund notifications can work. If a device code is shown, enter that current code on Twitch's activation page. See [Twitch app registration](https://dev.twitch.tv/docs/authentication/register-app) and [Device Code Flow](https://dev.twitch.tv/docs/authentication/getting-tokens-oauth/#device-code-grant-flow).
+
+![Step 2 — Client ID fields and account connection buttons](assets/setup-step-2-en.png)
+
+### 3. Create or choose a Channel Points reward
+
+In **Settings → Twitch reward**, enter a reward name and points cost, then click **Create reward**. Alternatively, click **Refresh rewards** and select a reward previously created using the same Twitch Client ID.
+
+If configuring the reward in Twitch, require text input so viewers can paste links, and keep redemptions in the request queue. Rewards created by a different developer app cannot be managed by this Client ID. Your Twitch channel must support custom Channel Points rewards.
+
+![Step 3 — choose the reward](assets/setup-step-3-en.png)
+
+### 4. Start Spotify and enable requests
+
+Open Spotify and play a track on the device you want to use. Return to **Overview** in TrackBridge and click **Start**. Wait for **Requests active · Twitch connected** before viewers use the selected reward.
+
+![Step 4 — Overview with active requests](assets/setup-step-4-en.png)
+
+Viewers can submit a Spotify track link, a YouTube link or a YouTube Music link. TrackBridge resolves supported video links to Spotify tracks and appends accepted requests to the Spotify queue. Keep both Spotify and TrackBridge running. Connecting accounts alone does not start request handling. Each broadcaster supplies their own developer application IDs.
+
 
 ## Automatic updates
 
@@ -65,7 +107,7 @@ When ready, click **Install update** and confirm the restart. Request handling s
 
 Version 1.7 needs a one-time manual upgrade to 1.8 or later. Close the old app, replace its files and keep `data`. The updater requires write access to the installation folder.
 
-## Beta limitations
+## Limitations
 
 - Matching may miss a song that exists in Spotify. Direct Spotify links are more reliable.
 - Songs are appended to the existing queue. Reward fulfillment confirms that Spotify accepted the queue request, not that the song played to completion.

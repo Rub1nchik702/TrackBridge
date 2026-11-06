@@ -1,6 +1,9 @@
 # Изменения
 
-## 1.9.0.1-beta.1 — 6 November 2026
+## 1.9.0.1 — 6 November 2026
+
+- Published as a regular stable release.
+- Added illustrated step-by-step setup instructions in English and Russian.
 
 - Included an English translation of the source code and application license. Existing terms and restrictions remain unchanged.
 
