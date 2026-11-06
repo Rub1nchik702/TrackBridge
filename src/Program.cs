@@ -39,7 +39,7 @@ public partial class MainWindow : Form {
  readonly bool previewMode;
  public MainWindow(Engine engine,bool preview=false) {
   previewMode=preview;
-  e=engine;Text="TrackBridge 1.8.7 beta · Twitch → Spotify";Size=new Size(1420,930);MinimumSize=new Size(1140,800);StartPosition=FormStartPosition.CenterScreen;
+  e=engine;Text="TrackBridge "+Updates.Current+" · Twitch → Spotify";Size=new Size(1420,930);MinimumSize=new Size(1140,800);StartPosition=FormStartPosition.CenterScreen;
   Icon=Icon.ExtractAssociatedIcon(Application.ExecutablePath);Font=new Font("Segoe UI",10);BackColor=Color.FromArgb(19,22,29);ForeColor=Color.FromArgb(235,239,246);DoubleBuffered=true;
   BuildDashboard();
   locked.Add(twitch);locked.Add(spotify);
@@ -120,7 +120,7 @@ public partial class MainWindow : Form {
     check(!login.IsCancellationRequested && !object.ReferenceEquals(login,previous),"retry has fresh cancellation state");previous=login;
    }
    twitch.Text="twitch-id-fixture";spotify.Text="spotify-id-fixture";title.Text="Custom reward title";
-   ChangeLanguage("en");check(skipAutomatic.Text=="Automatic: 50% of viewers","voting option translated");check(start.Text=="▶ Start" && stop.Text=="■ Stop" && updateButton.Text=="Check for updates","English action labels");
+   ChangeLanguage("en");check(navAbout.Text=="About" && Descendants(aboutHost).Any(c=>c.Text=="Support on DonateX ↗"),"About English translations");check(skipAutomatic.Text=="Automatic: 50% of viewers","voting option translated");check(start.Text=="▶ Start" && stop.Text=="■ Stop" && updateButton.Text=="Check for updates","English action labels");
    check(status.Text=="Requests stopped — click Start" && orders.Columns[0].Text=="Time","English dynamic status and columns");
    check(tray.ContextMenuStrip.Items[0].Text=="Open" && orders.ContextMenuStrip.Items[1].Text=="Reject and refund points","English tray and context menu");
    check(twitch.Text=="twitch-id-fixture" && spotify.Text=="spotify-id-fixture" && title.Text=="Custom reward title","language switch preserves input");

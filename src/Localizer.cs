@@ -8,6 +8,14 @@ static class L {
  public static string Canonical(string value) {var pair=English.FirstOrDefault(p=>p.Value==value);return pair.Key??value;}
  public static string Runtime(string value) {return T(Canonical(value));}
  public static readonly Dictionary<string,string> English=new Dictionary<string,string> {
+{"О программе","About"},
+{"Версия:","Version:"},
+{"Автор: Rub1nchik","Author: Rub1nchik"},
+{"OpenAI Codex — помощь в разработке, интерфейсе и документации.","OpenAI Codex \u2014 assistance with development, interface design and documentation."},
+{"Поддержать автора","Support the author"},
+{"Добровольная поддержка развития TrackBridge через DonateX.","Voluntary support for TrackBridge development via DonateX."},
+{"Поддержать на DonateX ↗","Support on DonateX \u2197"},
+
 {"Обзор","Overview"},
 {"Очередь","Queue"},
 {"Настройки","Settings"},
