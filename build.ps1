@@ -13,7 +13,7 @@ $iconResource = '/resource:' + $icon + ',TrackBridge.AppIcon'
 $exe = Join-Path $stage 'TrackBridge.exe'
 & $compiler /nologo /target:winexe /optimize+ /debug- /utf8output /win32icon:$icon $iconResource /r:System.Windows.Forms.dll /r:System.Drawing.dll /r:System.Net.Http.dll /r:System.Web.dll /r:System.Web.Extensions.dll /r:System.Security.dll /r:System.IO.Compression.dll /r:System.IO.Compression.FileSystem.dll /out:$exe $files
 if ($LASTEXITCODE -ne 0) { throw 'Compilation failed.' }
-$documents = @('README.md','README.en.md','README.ru.md','LICENSE.txt','THIRD-PARTY-NOTICES.txt','CHANGELOG.md','TRADEMARKS.md')
+$documents = @('README.md','README.ru.md','LICENSE.txt','THIRD-PARTY-NOTICES.txt','CHANGELOG.md','TRADEMARKS.md')
 foreach ($file in $documents) { Copy-Item -LiteralPath (Join-Path $PSScriptRoot $file) -Destination (Join-Path $stage $file) -Force }
 $readme = [Net.WebUtility]::HtmlEncode([IO.File]::ReadAllText((Join-Path $PSScriptRoot 'README.md')))
 [IO.File]::WriteAllText((Join-Path $stage 'README.html'),('<!doctype html><meta charset="utf-8"><title>TrackBridge</title><style>body{background:#161920;color:#e6eaf1;font:16px/1.6 system-ui;margin:40px}pre{white-space:pre-wrap}</style><pre>' + $readme + '</pre>'))
