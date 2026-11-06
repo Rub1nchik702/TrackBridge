@@ -14,11 +14,19 @@ TrackBridge only controls the queue and playback in your own Spotify player; it 
 
 ## Screenshots
 
-Overview and settings in version 1.8.6, shown with demonstration data.
+Interface of **TrackBridge 1.8.8-beta.1**, captured from the published application with demonstration data. No real accounts or tokens are shown.
 
-![TrackBridge overview](assets/interface-overview.png)
+### Overview — current track, votes and queue
 
-![TrackBridge settings](assets/interface-settings.png)
+![Overview — current track, votes and queue — 1.8.8-beta.1](assets/interface-overview-1.8.8-en.png)
+
+### Settings — connections and preferences
+
+![Settings — connections and preferences — 1.8.8-beta.1](assets/interface-settings-1.8.8-en.png)
+
+### About — version, author, OpenAI Codex and DonateX
+
+![About — version, author, OpenAI Codex and DonateX — 1.8.8-beta.1](assets/interface-about-1.8.8-en.png)
 
 ## Features
 
