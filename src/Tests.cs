@@ -142,7 +142,7 @@ static class Tests {
   bool rejected=false;try{Updates.Extract(archive,Path.Combine(dir,"bad-hash"),new string('0',64));}catch(IOException){rejected=true;}Check(rejected,"reject corrupt package hash");
   byte[] unsafeZip=UpdateZip(true);string unsafeArchive=Path.Combine(dir,"unsafe.zip");File.WriteAllBytes(unsafeArchive,unsafeZip);
   rejected=false;try{Updates.Extract(unsafeArchive,Path.Combine(dir,"bad-path"),Updates.Hash(unsafeZip));}catch(IOException){rejected=true;}Check(rejected,"reject zip traversal and unexpected settings entry");
-  string tag="v1.8.6-beta.2",asset="TrackBridge-1.8.6-beta.2-win.zip";
+  string tag="v1.8.7-beta.2",asset="TrackBridge-1.8.7-beta.2-win.zip";
   byte[] manifestBytes=System.Text.Encoding.UTF8.GetBytes(Engine.Json(new {version=tag.Substring(1),archive=asset,sha256=Updates.Hash(bytes)})),signatureBytes;
   string keyPath=Environment.GetEnvironmentVariable("TRACKBRIDGE_TEST_SIGNING_KEY");if(string.IsNullOrEmpty(keyPath))throw new Exception("Signed updater checks require the private build environment.");
   using(var rsa=new RSACryptoServiceProvider()){rsa.PersistKeyInCsp=false;rsa.FromXmlString(System.Text.Encoding.UTF8.GetString(ProtectedData.Unprotect(File.ReadAllBytes(keyPath),null,DataProtectionScope.CurrentUser)));signatureBytes=System.Text.Encoding.ASCII.GetBytes(Convert.ToBase64String(rsa.SignData(manifestBytes,CryptoConfig.MapNameToOID("SHA256"))));}

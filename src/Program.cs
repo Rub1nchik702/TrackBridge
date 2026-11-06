@@ -39,7 +39,7 @@ public partial class MainWindow : Form {
  readonly bool previewMode;
  public MainWindow(Engine engine,bool preview=false) {
   previewMode=preview;
-  e=engine;Text="TrackBridge 1.8.6 beta · Twitch → Spotify";Size=new Size(1420,930);MinimumSize=new Size(1140,800);StartPosition=FormStartPosition.CenterScreen;
+  e=engine;Text="TrackBridge 1.8.7 beta · Twitch → Spotify";Size=new Size(1420,930);MinimumSize=new Size(1140,800);StartPosition=FormStartPosition.CenterScreen;
   Icon=Icon.ExtractAssociatedIcon(Application.ExecutablePath);Font=new Font("Segoe UI",10);BackColor=Color.FromArgb(19,22,29);ForeColor=Color.FromArgb(235,239,246);DoubleBuffered=true;
   BuildDashboard();
   locked.Add(twitch);locked.Add(spotify);
