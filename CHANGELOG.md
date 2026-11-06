@@ -1,5 +1,9 @@
 # Изменения
 
+## 1.9.0.1-beta.1 — 6 November 2026
+
+- Included an English translation of the source code and application license. Existing terms and restrictions remain unchanged.
+
 ## 1.9.0-beta.1 — 6 ноября 2026
 
 - Исправлена отдельная страница очереди и добавлено пустое состояние.
