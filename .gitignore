@@ -1,15 +1,24 @@
-# Only explicitly listed publication files may enter this repository.
-*
-!/.gitignore
-!/README.md
-!/README.en.md
-!/LICENSE.txt
-!/THIRD-PARTY-NOTICES.txt
-!/CHANGELOG.md
-!/assets/
-!/assets/TrackBridge-icon.png
-!/.github/
-!/.github/ISSUE_TEMPLATE/
-!/.github/ISSUE_TEMPLATE/bug_report.md
-
-# Executables belong in GitHub Release assets, not in Git history.
+# Local user data and private build material
+/data/
+**/data/
+/.updates/
+**/.updates/
+/work/
+/dist/
+/bin/
+/obj/
+/.vs/
+*.dpapi
+*.pfx
+*.p12
+*.pem
+*.key
+*.bin
+*.exe
+*.zip
+*.sig
+.env*
+*private*
+self-test.txt
+ui-preview.png
+ui-settings-preview.png

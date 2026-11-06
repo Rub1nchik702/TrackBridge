@@ -35,7 +35,7 @@ Overview and settings in version 1.8.6, shown with demonstration data.
 
 Get the Windows ZIP from [Releases](https://github.com/Rub1nchik702/TrackBridge/releases). Extract the entire archive to a writable folder and run `TrackBridge.exe`.
 
-Requires Windows 10/11, .NET Framework 4.7.2 or later, Spotify Premium and an active Spotify player. Your Twitch channel must support custom Channel Points rewards. The executable is currently unsigned. Source code is closed; obfuscation makes inspection harder but cannot prevent reverse engineering.
+Requires Windows 10/11, .NET Framework 4.7.2 or later, Spotify Premium and an active Spotify player. Your Twitch channel must support custom Channel Points rewards. The executable has no Windows code-signing certificate. Public-source builds use no obfuscation.
 
 ## Setup
 
@@ -73,7 +73,7 @@ When reporting a problem, include the version, steps and sanitized log lines. Do
 
 ## License
 
-By **Rub1nchik**. See [LICENSE.txt](LICENSE.txt) and [THIRD-PARTY-NOTICES.txt](THIRD-PARTY-NOTICES.txt). This repository contains public documentation and release materials only.
+By **Rub1nchik**. See [LICENSE.txt](LICENSE.txt) and [THIRD-PARTY-NOTICES.txt](THIRD-PARTY-NOTICES.txt). Source is available in [src](src) for inspection and private personal modifications under [LICENSE.txt](LICENSE.txt). Selling the software or distributing modified binaries or source requires written permission from Rub1nchik. The TrackBridge name and logo identify official releases; they may not be used to impersonate them. This is source-available, not OSI open source.
 
 TrackBridge controls your own Spotify player and does not grant broadcasting rights. Premium does not authorize streaming music to an audience. Follow [Spotify's policies](https://developer.spotify.com/policy) and Twitch's rules. TrackBridge is not affiliated with Spotify, Twitch, YouTube. Paid access and donation features are not enabled.
 
@@ -105,3 +105,9 @@ Rules apply before queueing pending and new requests, including direct Spotify l
 Use Overview, Queue, Moderation and Settings in the sidebar. Settings contains account connections, the Twitch reward, voting threshold and updates. Start and stop requests from Overview.
 
 The player card shows the track title, artist, Spotify cover when available and playback progress. The voting card displays votes and the fixed threshold. The bridge and waveform logo is also used for the application and tray icons.
+
+## Build from source
+
+On Windows run `powershell -NoProfile -File .\build.ps1` with .NET Framework 4.7.2 or newer and its C# compiler. Output goes to `dist`. GitHub Actions builds the same source on main pushes and manual dispatch, without obfuscation. Artifacts are associated with a commit; byte-for-byte reproducibility is not claimed.
+
+The workflow receives no secrets and does not sign updater packages. Actions artifacts are for manual installation; official automatic updates are additionally signed by the author outside CI. src/SigningKey.cs contains only the public verification key. Never publish data, .updates, tokens, private keys or local history. Available source does not guarantee that any third-party binary is safe.
