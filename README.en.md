@@ -4,9 +4,17 @@
 
 <img src="assets/TrackBridge-icon.png" width="96" alt="TrackBridge icon">
 
-**By Rub1nchik · Windows · 1.8.3 beta**
+**By Rub1nchik · Windows · 1.8.6 beta**
 
 TrackBridge connects a custom Twitch Channel Points reward to your Spotify queue. Viewers submit a song link, the app finds a matching Spotify track and adds it to the end of your queue without interrupting the current song.
+
+## Screenshots
+
+Overview and settings in version 1.8.6, shown with demonstration data.
+
+![TrackBridge overview](assets/interface-overview.png)
+
+![TrackBridge settings](assets/interface-settings.png)
 
 ## Features
 
@@ -17,7 +25,7 @@ TrackBridge connects a custom Twitch Channel Points reward to your Spotify queue
 - Duplicate prevention and manual resolution of uncertain playback requests.
 - System tray support and Windows DPAPI protection for stored tokens.
 - Automatic GitHub release checks, verified downloads and restart-to-install updates.
-- Russian and English UI. Use the language selector at the top right; changes apply immediately and are saved. Account IDs and custom reward titles are preserved. Earlier log entries stay in their original language. New chat notifications use the selected language.
+- Russian and English UI. Use the RU/EN buttons in the sidebar; changes apply immediately and are saved. Account IDs and custom reward titles are preserved. Earlier log entries stay in their original language. New chat notifications use the selected language.
 
 ## Download
 
@@ -73,6 +81,23 @@ Future updates require a publisher-signed RSA/SHA-256 manifest verified against 
 
 ## Chat commands
 
-- `!song` replies with the current Spotify track and link, with a shared 5-second reply cooldown.
-- `!voteskip` skips after votes from 5 different Twitch user IDs. Duplicate votes are ignored. Votes reset when the track changes or playback returns to the beginning. Skipping does not refund channel points.
+- `!song` or `!nowplaying` replies with the current Spotify track and link, with a shared 5-second reply cooldown.
+- `!skip` or `!voteskip` votes to skip. Automatic mode requires 50% of viewers, rounded up (11 viewers → 6 votes). Below 100 viewers, the owner can choose a manual threshold of 1–99 votes. At 100 or more viewers, 50% always applies.
+- Twitch viewer count is fetched at the first vote and the threshold is fixed for that track. No new votes are accepted without a live viewer count. Duplicate Twitch user IDs are ignored. Votes reset on track changes or rewinding to the beginning. Change settings while stopped. Skipping does not refund channel points.
 - Click Start and keep Spotify active. Reconnect Twitch once to grant permission to read and send chat messages.
+
+## Controls and moderation
+
+The live panel shows the current track, Twitch viewer count and vote progress. Click the track to open Spotify. Viewer count refreshes about every 30 seconds; the vote threshold remains fixed for the track.
+
+Use Skip track or Reset votes while requests are running. Voting enabled can disable viewer votes while keeping song commands. Resetting votes does not unlock a skip with an uncertain Spotify response.
+
+While stopped, open Request moderation to set a duration limit (10 minutes by default; 0 disables it), block Explicit tracks, and edit blocked track/artist lists. Use one entry per line. Matching is exact and case insensitive. Tracks accept Spotify links or exact titles; title bans apply to all artists. Artist entries use the exact Spotify name. Explicit relies on Spotify metadata and cannot guarantee filtering every unwanted lyric.
+
+Rules apply before queueing pending and new requests, including direct Spotify links. Tracks already queued are not removed. Rejected orders refund points; unavailable metadata is handled as a temporary failure.
+
+## Interface
+
+Use Overview, Queue, Moderation and Settings in the sidebar. Settings contains account connections, the Twitch reward, voting threshold and updates. Start and stop requests from Overview.
+
+The player card shows the track title, artist, Spotify cover when available and playback progress. The voting card displays votes and the fixed threshold. The bridge and waveform logo is also used for the application and tray icons.
