@@ -4,5 +4,5 @@ using System.Reflection;
 [assembly: AssemblyProduct("TrackBridge")]
 [assembly: AssemblyCompany("Rub1nchik")]
 [assembly: AssemblyCopyright("Copyright © 2026 Rub1nchik. All rights reserved.")]
-[assembly: AssemblyVersion("1.8.8.0")]
-[assembly: AssemblyFileVersion("1.8.8.0")]
+[assembly: AssemblyVersion("1.9.0.0")]
+[assembly: AssemblyFileVersion("1.9.0.0")]

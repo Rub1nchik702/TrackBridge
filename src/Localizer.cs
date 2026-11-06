@@ -8,6 +8,20 @@ static class L {
  public static string Canonical(string value) {var pair=English.FirstOrDefault(p=>p.Value==value);return pair.Key??value;}
  public static string Runtime(string value) {return T(Canonical(value));}
  public static readonly Dictionary<string,string> English=new Dictionary<string,string> {
+{"Очистить сыгранные","Clear played tracks"},
+{"Скрыть выбранный","Hide selected"},
+{"Автоматически скрывать сыгранные","Auto-hide played tracks"},
+{"Можно скрыть только сыгранный заказ.","Only a played request can be hidden."},
+{"Заказов пока нет. Новые заказы появятся здесь.","No requests yet. New requests will appear here."},
+{"Сыгран / пропущен","Played / skipped"},
+
+{"Журнал событий","Event log"},
+{"Автопрокрутка","Auto-scroll"},
+{"Копировать журнал","Copy log"},
+{"Очистить журнал","Clear log"},
+{"Буфер обмена занят. Повторите копирование.","Clipboard is busy. Please try copying again."},
+{"Журнал хранится только в текущем сеансе. Перед отправкой удалите личные данные.","The log is kept for this session only. Remove personal information before sharing."},
+
 {"О программе","About"},
 {"Версия:","Version:"},
 {"Автор: Rub1nchik","Author: Rub1nchik"},

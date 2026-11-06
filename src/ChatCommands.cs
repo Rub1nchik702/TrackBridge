@@ -82,7 +82,7 @@ public class ChatCommands {
   lock(seen){if(!seen.Add(id))return;seenOrder.Enqueue(id);if(seenOrder.Count>1000)seen.Remove(seenOrder.Dequeue());}
   inbox.Enqueue(message);
  }
- async Task Refresh(){Votes.Observe(await e.Api(true,"GET","me/player"));Publish();}
+ async Task Refresh(){long prior=Votes.Generation;Votes.Observe(await e.Api(true,"GET","me/player"));e.ObserveOrderedPlayback(Votes.Uri,Votes.Playing,Votes.Generation!=prior);Publish();}
  async Task Reply(string text){
   var result=await e.Api(false,"POST","chat/messages",new {broadcaster_id=e.S.broadcaster,sender_id=e.S.broadcaster,message=text});
   var row=Engine.Data(result).FirstOrDefault();if(row==null || !row.ContainsKey("is_sent") || !Convert.ToBoolean(row["is_sent"]))e.Log(L.Language=="en"?"Twitch did not deliver a command reply.":"Twitch не доставил ответ на команду.");

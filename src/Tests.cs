@@ -22,13 +22,13 @@ static class Tests {
  }
  static void TestLoginControls() {
   string dir=Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"diagnostics","ui-"+Guid.NewGuid().ToString("N"));
-  using(var e=new Engine(dir))using(var form=new MainWindow(e)) form.VerifyControls(Check);
+  using(var e=new Engine(dir))using(var form=new MainWindow(e,true)) form.VerifyControls(Check);
  }
  static Dictionary<string,object> Event(string id,string input) {
   return new Dictionary<string,object>{{"id",id},{"reward",new Dictionary<string,object>{{"id","r"}}},{"user_name","viewer"},{"user_input",input}};
  }
  static async Task RunAsync() {
-  await TestCommands();await TestModeration();TestLimits();
+  await TestCommands();await TestModeration();TestCleanup();TestLimits();
   var request=Engine.Obj(Engine.Json(new {broadcaster_id="test",sender_id="test",message="check"}));
   Check(Engine.Str(request,"broadcaster_id")=="test" && Engine.Str(request,"message")=="check","anonymous API body keeps wire names");
   var settingsRoundTrip=new System.Web.Script.Serialization.JavaScriptSerializer().Deserialize<Settings>(Engine.Json(new Settings()));
@@ -142,7 +142,7 @@ static class Tests {
   bool rejected=false;try{Updates.Extract(archive,Path.Combine(dir,"bad-hash"),new string('0',64));}catch(IOException){rejected=true;}Check(rejected,"reject corrupt package hash");
   byte[] unsafeZip=UpdateZip(true);string unsafeArchive=Path.Combine(dir,"unsafe.zip");File.WriteAllBytes(unsafeArchive,unsafeZip);
   rejected=false;try{Updates.Extract(unsafeArchive,Path.Combine(dir,"bad-path"),Updates.Hash(unsafeZip));}catch(IOException){rejected=true;}Check(rejected,"reject zip traversal and unexpected settings entry");
-  string tag="v1.8.8-beta.2",asset="TrackBridge-1.8.8-beta.2-win.zip";
+  string tag="v1.9.0-beta.2",asset="TrackBridge-1.9.0-beta.2-win.zip";
   byte[] manifestBytes=System.Text.Encoding.UTF8.GetBytes(Engine.Json(new {version=tag.Substring(1),archive=asset,sha256=Updates.Hash(bytes)})),signatureBytes;
   string keyPath=Environment.GetEnvironmentVariable("TRACKBRIDGE_TEST_SIGNING_KEY");if(string.IsNullOrEmpty(keyPath))throw new Exception("Signed updater checks require the private build environment.");
   using(var rsa=new RSACryptoServiceProvider()){rsa.PersistKeyInCsp=false;rsa.FromXmlString(System.Text.Encoding.UTF8.GetString(ProtectedData.Unprotect(File.ReadAllBytes(keyPath),null,DataProtectionScope.CurrentUser)));signatureBytes=System.Text.Encoding.ASCII.GetBytes(Convert.ToBase64String(rsa.SignData(manifestBytes,CryptoConfig.MapNameToOID("SHA256"))));}
@@ -220,6 +220,19 @@ static class Tests {
    e.Save();
   }
   using(var e=new Engine(dir))Check(e.S.maxTrackMinutes==10 && e.S.votingEnabled,"moderation and voting settings persist");
+ }
+ static void TestCleanup(){
+  string dir=Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"diagnostics","cleanup-"+Guid.NewGuid().ToString("N"));
+  using(var e=new Engine(dir)){
+   var first=new Order{id="first",uri="spotify:track:4uLU6hMCjMI75M1A2tKUQC",status="done"};
+   var second=new Order{id="second",uri="spotify:track:1234567890123456789012",status="done"};
+   var pending=new Order{id="pending",uri=second.uri,status="pending"};e.S.orders.AddRange(new[]{first,second,pending});e.S.recentReceipts.Add("b:first");
+   Check(e.HidePlayedOrders()==0,"queue acceptance alone is not playback");e.ObserveOrderedPlayback(first.uri,true);Check(!e.CanHideOrder(first),"currently playing request protected");e.ObserveOrderedPlayback("",false);Check(!first.played,"missing playback response is not completion");e.ObserveOrderedPlayback(second.uri,true);
+   Check(first.played && !second.played,"observed track transition marks only previous request");Check(e.HidePlayedOrders()==1 && first.historyHidden && !second.historyHidden && !pending.historyHidden,"cleanup preserves current and pending requests");Check(e.S.recentReceipts.Contains("b:first"),"cleanup retains deduplication receipts");
+   e.S.autoHidePlayed=true;e.Save();
+  }
+  using(var e=new Engine(dir))Check(e.S.autoHidePlayed && e.S.orders[0].historyHidden,"cleanup preference and hidden history persist");
+  Check(Updates.Compare("1.9.0.1-beta.1","1.9.0-beta.1")>0,"four-part interface versions order correctly");Check(Updates.Compare("2.0.0","2.0.0-beta.99")>0,"2.0 stable newer than beta");
  }
  static void TestLimits(){
   bool rejected=false;try{Engine.ReadRequestLine(new MemoryStream(new byte[9000]));}catch(IOException){rejected=true;}Check(rejected,"OAuth line length bounded");

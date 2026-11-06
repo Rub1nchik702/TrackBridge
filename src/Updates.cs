@@ -13,17 +13,17 @@ using System.Windows.Forms;
 
 namespace TrackBridge {
 static class Updates {
- public const string Current="1.8.8-beta.1";
+ public const string Current="1.9.0-beta.1";
  public const string Repository="https://github.com/Rub1nchik702/TrackBridge";
  static readonly string[] Files={"TrackBridge.exe","README.md","README.html","LICENSE.txt","THIRD-PARTY-NOTICES.txt","CHANGELOG.md"};
  internal static Func<HttpMessageHandler> TestHandler;
  public static int Compare(string a,string b) {
-  var pattern=@"^v?(\d+)\.(\d+)\.(\d+)(?:-beta\.(\d+))?$";
+  var pattern=@"^v?(\d+)\.(\d+)\.(\d+)(?:\.(\d+))?(?:-beta\.(\d+))?$";
   var x=Regex.Match(a??"",pattern);var y=Regex.Match(b??"",pattern);
   if(!x.Success || !y.Success)throw new FormatException(L.T("Некорректная версия релиза."));
-  for(int i=1;i<=3;i++){int c=int.Parse(x.Groups[i].Value).CompareTo(int.Parse(y.Groups[i].Value));if(c!=0)return c;}
-  if(x.Groups[4].Success!=y.Groups[4].Success)return x.Groups[4].Success?-1:1;
-  return x.Groups[4].Success?int.Parse(x.Groups[4].Value).CompareTo(int.Parse(y.Groups[4].Value)):0;
+  for(int i=1;i<=4;i++){int c=int.Parse(x.Groups[i].Success?x.Groups[i].Value:"0").CompareTo(int.Parse(y.Groups[i].Success?y.Groups[i].Value:"0"));if(c!=0)return c;}
+  if(x.Groups[5].Success!=y.Groups[5].Success)return x.Groups[5].Success?-1:1;
+  return x.Groups[5].Success?int.Parse(x.Groups[5].Value).CompareTo(int.Parse(y.Groups[5].Value)):0;
  }
  public static Dictionary<string,object> SelectRelease(string json,string current) {
   var releases=new System.Web.Script.Serialization.JavaScriptSerializer().DeserializeObject(json) as object[];
@@ -32,7 +32,7 @@ static class Updates {
   foreach(var item in releases) {
    var r=item as Dictionary<string,object>;if(r==null || (r.ContainsKey("draft") && Convert.ToBoolean(r["draft"])))continue;
    string version=Engine.Str(r,"tag_name");
-   if(!Regex.IsMatch(version,@"^v\d+\.\d+\.\d+(?:-beta\.\d+)?$"))continue;
+   if(!Regex.IsMatch(version,@"^v\d+\.\d+\.\d+(?:\.\d+)?(?:-beta\.\d+)?$"))continue;
    if(Compare(version,current)>0 && (best==null || Compare(version,Engine.Str(best,"tag_name"))>0))best=r;
   }
   return best;
@@ -51,7 +51,7 @@ static class Updates {
   using(var rsa=new RSACryptoServiceProvider()){rsa.PersistKeyInCsp=false;rsa.FromXmlString(SigningKey.PublicXml);if(!rsa.VerifyData(json,CryptoConfig.MapNameToOID("SHA256"),Convert.FromBase64String(signature.Trim())))throw new IOException("Publisher signature verification failed. Update refused.");}
   var manifest=Engine.Obj(System.Text.Encoding.UTF8.GetString(json));
   string version=Engine.Str(manifest,"version");
-  if(!Regex.IsMatch(version,@"^\d+\.\d+\.\d+(?:-beta\.\d+)?$") || Engine.Str(manifest,"archive")!="TrackBridge-"+version+"-win.zip" || !Regex.IsMatch(Engine.Str(manifest,"sha256"),@"^[a-f0-9]{64}$"))throw new IOException("Invalid signed update manifest.");
+  if(!Regex.IsMatch(version,@"^\d+\.\d+\.\d+(?:\.\d+)?(?:-beta\.\d+)?$") || Engine.Str(manifest,"archive")!="TrackBridge-"+version+"-win.zip" || !Regex.IsMatch(Engine.Str(manifest,"sha256"),@"^[a-f0-9]{64}$"))throw new IOException("Invalid signed update manifest.");
   return manifest;
  }
  static async Task<byte[]> DownloadSmall(HttpClient client,string url,CancellationToken ct){
@@ -101,7 +101,7 @@ static class Updates {
     }
    }
    string hash=digest.Substring(7);Extract(Path.Combine(stage,"update.zip"),Path.Combine(stage,"payload"),hash);
-   string expected=tag.Substring(1).Split('-')[0]+".0";
+   string expected=tag.Substring(1).Split('-')[0];if(expected.Split('.').Length==3)expected+=".0";
    if(FileVersionInfo.GetVersionInfo(Path.Combine(stage,"payload","TrackBridge.exe")).FileVersion!=expected)throw new IOException(L.T("Версия файла не совпадает с тегом релиза."));
    File.WriteAllText(Path.Combine(stage,"digest.txt"),hash);log(L.T("Обновление ")+tag+L.T(" загружено и проверено. Нажмите «Установить обновление»."));return stage;
   }

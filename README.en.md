@@ -1,10 +1,10 @@
 # TrackBridge
 
-[Русский](README.md) · **English**
+[Русский](README.ru.md) · **English**
 
 <img src="assets/TrackBridge-icon.png" width="96" alt="TrackBridge icon">
 
-**By Rub1nchik · Windows · 1.8.8 beta**
+**By Rub1nchik · Windows · 1.9.0 beta**
 
 TrackBridge connects a custom Twitch Channel Points reward to your Spotify queue. Viewers submit a song link, the app finds a matching Spotify track and adds it to the end of your queue without interrupting the current song.
 
@@ -14,19 +14,19 @@ TrackBridge only controls the queue and playback in your own Spotify player; it 
 
 ## Screenshots
 
-Interface of **TrackBridge 1.8.8-beta.1**, captured from the published application with demonstration data. No real accounts or tokens are shown.
+TrackBridge **1.9.0-beta.1**, shown with demonstration data.
 
-### Overview — current track, votes and queue
+### Overview
 
-![Overview — current track, votes and queue — 1.8.8-beta.1](assets/interface-overview-1.8.8-en.png)
+![Overview](assets/interface-overview-1.9.0-en.png)
 
-### Settings — connections and preferences
+### Queue and history cleanup
 
-![Settings — connections and preferences — 1.8.8-beta.1](assets/interface-settings-1.8.8-en.png)
+![Queue and history cleanup](assets/interface-queue-1.9.0-en.png)
 
-### About — version, author, OpenAI Codex and DonateX
+### About and DonateX
 
-![About — version, author, OpenAI Codex and DonateX — 1.8.8-beta.1](assets/interface-about-1.8.8-en.png)
+![About and DonateX](assets/interface-about-1.9.0-en.png)
 
 ## Features
 
@@ -128,3 +128,11 @@ The workflow receives no secrets and does not sign updater packages. Actions art
 ## About
 
 The About page in the sidebar shows the current version, author Rub1nchik and OpenAI Codex assistance. The DonateX button opens voluntary support at https://donatex.gg/donate/rub1nchik.
+
+## Event log
+
+The event log has its own sidebar page with wrapped lines, optional auto-scroll, copy and clear controls. It is kept in memory for the current session with bounded history. Remove personal information before sharing.
+
+## Request history cleanup
+
+Clear played tracks hides requests that TrackBridge observed playing and subsequently leaving playback (including skips). A selected played entry can also be hidden. Auto-hide is optional and saved. This cleans TrackBridge history, not the Spotify queue. Current tracks and pending or uncertain requests are protected. Playback that happened while the app was stopped is not guessed retroactively.

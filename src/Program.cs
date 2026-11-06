@@ -18,6 +18,9 @@ public partial class MainWindow : Form {
  NumericUpDown cost=new NumericUpDown();
  ComboBox rewards=new ComboBox();
  RichTextBox logs=new RichTextBox();
+ readonly System.Collections.Concurrent.ConcurrentQueue<string> pendingLogs=new System.Collections.Concurrent.ConcurrentQueue<string>();
+ readonly System.Windows.Forms.Timer logTimer=new System.Windows.Forms.Timer();
+ readonly CheckBox autoScrollLog=new CheckBox();
  ListView orders=new ListView();
  Label status=new Label(),accounts=new Label();
  Button start=new SoftButton(),stop=new SoftButton(),cancelLogin=new SoftButton();
@@ -39,7 +42,7 @@ public partial class MainWindow : Form {
  readonly bool previewMode;
  public MainWindow(Engine engine,bool preview=false) {
   previewMode=preview;
-  e=engine;Text="TrackBridge "+Updates.Current+" · Twitch → Spotify";Size=new Size(1420,930);MinimumSize=new Size(1140,800);StartPosition=FormStartPosition.CenterScreen;
+  e=engine;Text="TrackBridge "+Updates.Current+" · Twitch → Spotify";Size=new Size(1440,920);MinimumSize=new Size(1140,800);AutoScaleMode=AutoScaleMode.Dpi;AutoScaleDimensions=new SizeF(96,96);StartPosition=FormStartPosition.CenterScreen;
   Icon=Icon.ExtractAssociatedIcon(Application.ExecutablePath);Font=new Font("Segoe UI",10);BackColor=Color.FromArgb(19,22,29);ForeColor=Color.FromArgb(235,239,246);DoubleBuffered=true;
   BuildDashboard();
   locked.Add(twitch);locked.Add(spotify);
@@ -108,7 +111,7 @@ public partial class MainWindow : Form {
  void CancelConnection(){login.Cancel();cancelLogin.Enabled=false;Log(L.T("Отмена подключения… Поля Client ID станут доступны после отмены."));}
  internal void VerifyControls(Action<bool,string> check) {
   try {
-   VerifyDashboard(check);RefreshView();check(status.Text.Contains(L.T("нажмите «Запустить»")),"stopped reception status");
+   VerifyDashboard(check);VerifyJournal(check);RefreshView();check(status.Text.Contains(L.T("нажмите «Запустить»")),"stopped reception status");
    running=new CancellationTokenSource();e.Reception(true,L.T("Приём заказов активен · Twitch подключён"));
    check(status.Text.Contains(L.T("Приём заказов активен")),"live reception status");
    running.Dispose();running=null;check(Icon!=null,"embedded icon");
@@ -183,10 +186,29 @@ public partial class MainWindow : Form {
   if(MessageBox.Show(this,added?L.T("Вы проверили, что трек уже есть в Spotify? Баллы будут списаны."):L.T("Отклонить награду и вернуть зрителю баллы?"),L.T("Решение по заказу"),MessageBoxButtons.YesNo)!=DialogResult.Yes)return;
   await e.Mark(o,added?"FULFILLED":"CANCELED");o.status=added?"done":"canceled";o.note=L.T("Обработано вручную");e.Save();
  }
+ internal void VerifyJournal(Action<bool,string> check){
+  string discard;while(pendingLogs.TryDequeue(out discard)){}logs.Clear();
+  ShowJournal();check(logHost.Parent.Controls.GetChildIndex(logHost)==0,"journal navigation opens dedicated page");
+  for(int i=0;i<180;i++)Log("fixture-"+i.ToString("000"));FlushLog();check(pendingLogs.Count>0 && logs.Text.Contains("fixture-099") && !logs.Text.Contains("fixture-179"),"event burst is batched without draining UI indefinitely");FlushLog();check(logs.Text.Contains("fixture-179") && pendingLogs.IsEmpty,"remaining log messages retained in order");
+  autoScrollLog.Checked=false;logs.Select(0,5);Log("new-message-while-reading");FlushLog();check(logs.SelectionStart==0 && logs.SelectionLength==5,"new messages preserve reader selection when auto-scroll is off");
+  check(logs.WordWrap && logs.ReadOnly && logs.Font.Name=="Consolas","journal readable wrapped monospace output");
+  autoScrollLog.Checked=true;logs.Clear();Navigate(false,false);
+ }
  public void Log(string text) {
-  if(IsDisposed)return;if(InvokeRequired){BeginInvoke(new Action<string>(Log),text);return;}
-  if(activityLine!=null)activityLine.Text=text;
-  logs.AppendText(DateTime.Now.ToString("HH:mm:ss")+"  "+text+Environment.NewLine);if(logs.TextLength>50000)logs.Text=logs.Text.Substring(logs.TextLength-30000);logs.SelectionStart=logs.TextLength;logs.ScrollToCaret();
+  if(IsDisposed || pendingLogs.Count>=2000)return;
+  pendingLogs.Enqueue(DateTime.Now.ToString("HH:mm:ss")+"  "+text);
+ }
+ [System.Runtime.InteropServices.DllImport("user32.dll")]static extern IntPtr SendMessage(IntPtr window,int message,IntPtr wParam,IntPtr lParam);
+ void FlushLog(){
+  if(IsDisposed || logs.IsDisposed || pendingLogs.IsEmpty)return;
+  int selection=logs.SelectionStart,length=logs.SelectionLength,first=(int)SendMessage(logs.Handle,0xCE,IntPtr.Zero,IntPtr.Zero);
+  var batch=new System.Text.StringBuilder();string line,last=null;int count=0;
+  while(count++<100 && pendingLogs.TryDequeue(out line)){batch.AppendLine(line);last=line;}
+  logs.AppendText(batch.ToString());int removed=0,removedLines=0;
+  if(logs.TextLength>160000){int cut=logs.Text.IndexOf('\n',logs.TextLength-120000);if(cut>=0){removed=cut+1;removedLines=logs.Text.Substring(0,removed).Count(c=>c=='\n');logs.Select(0,removed);logs.SelectedText="";}}
+  if(autoScrollLog.Checked){logs.Select(logs.TextLength,0);logs.ScrollToCaret();}
+  else{logs.Select(Math.Min(logs.TextLength,Math.Max(0,selection-removed)),Math.Min(length,Math.Max(0,logs.TextLength-Math.Max(0,selection-removed))));int current=(int)SendMessage(logs.Handle,0xCE,IntPtr.Zero,IntPtr.Zero);SendMessage(logs.Handle,0xB6,IntPtr.Zero,new IntPtr(Math.Max(0,first-removedLines)-current));}
+  if(last!=null && activityLine!=null)activityLine.Text=last.Replace("\r"," ").Replace("\n"," ");
  }
  public void RefreshView() {
   if(IsDisposed)return;if(InvokeRequired){BeginInvoke(new Action(RefreshView));return;}
@@ -197,8 +219,8 @@ public partial class MainWindow : Form {
   votePanel.Text=running==null?L.T("Голосование ожидает запуска"):e.VoteStatus;
   string selected=orders.SelectedItems.Count>0?((Order)orders.SelectedItems[0].Tag).id:null;
   orders.BeginUpdate();orders.Items.Clear();
-  lock(e.Gate)foreach(var o in e.S.orders.AsEnumerable().Reverse().Take(300)) {
-   string label=o.status=="done"?L.T("В очереди Spotify"):o.status=="canceled"?L.T("Баллы возвращены"):o.status=="uncertain"?L.T("Проверьте вручную"):o.status=="pending"?L.T("Ожидание"):o.status=="sending"?L.T("Отправка"):o.status=="queued"?L.T("Подтверждение"):o.status=="reject"?L.T("Возврат баллов"):L.T("Проверьте Twitch");
+  lock(e.Gate)foreach(var o in e.S.orders.Where(o=>!o.historyHidden && !(e.S.autoHidePlayed && o.played && o.status=="done")).Reverse().Take(300)) {
+   string label=o.played && o.status=="done"?L.T("Сыгран / пропущен"):o.status=="done"?L.T("В очереди Spotify"):o.status=="canceled"?L.T("Баллы возвращены"):o.status=="uncertain"?L.T("Проверьте вручную"):o.status=="pending"?L.T("Ожидание"):o.status=="sending"?L.T("Отправка"):o.status=="queued"?L.T("Подтверждение"):o.status=="reject"?L.T("Возврат баллов"):L.T("Проверьте Twitch");
    DateTime orderedAt;string time=DateTime.TryParse(o.time,out orderedAt)?orderedAt.ToString("HH:mm"):o.time;
    var row=new ListViewItem(new[]{time,o.user,label,(string.IsNullOrEmpty(o.trackTitle)?(o.uri??o.input):o.trackTitle+" — "+o.trackArtist)+" — "+L.Runtime(o.note)}){Tag=o,ToolTipText=(o.uri??o.input)+" — "+L.Runtime(o.note)};orders.Items.Add(row);if(o.id==selected)row.Selected=true;
   }

@@ -1,129 +1,138 @@
 # TrackBridge
 
-**Русский** · [English](README.en.md)
+[Русский](README.ru.md) · **English**
 
 <img src="assets/TrackBridge-icon.png" width="96" alt="TrackBridge icon">
 
-**Автор: Rub1nchik · Windows · Версия 1.8.8-beta.1**
+**By Rub1nchik · Windows · 1.9.0 beta**
 
-TrackBridge связывает пользовательскую награду за баллы Twitch с очередью вашего Spotify. Зритель отправляет ссылку на песню, программа ищет соответствующий трек в Spotify и добавляет его в конец очереди. Текущая песня не прерывается.
+TrackBridge connects a custom Twitch Channel Points reward to your Spotify queue. Viewers submit a song link, the app finds a matching Spotify track and adds it to the end of your queue without interrupting the current song.
 
-## Права на музыку и использование в эфире
+## Music rights and broadcasting
 
-TrackBridge только управляет очередью и воспроизведением в вашем плеере Spotify; программа не передаёт аудиопоток зрителям. Она не предоставляет прав на музыку или её использование в эфире, трансляциях и записях. Пользователь самостоятельно обеспечивает необходимые права и разрешения и соблюдает права правообладателей, применимое законодательство и условия Spotify, Twitch и других используемых сервисов. Spotify Premium, наличие трека в каталоге и успешное добавление в очередь не означают разрешения на вещание.
+TrackBridge only controls the queue and playback in your own Spotify player; it does not transmit an audio stream to viewers. It does not grant rights to music or permission to use it in broadcasts, live streams or recordings. Users are responsible for obtaining the necessary rights and permissions and complying with rights holders’ rights, applicable law and the terms of Spotify, Twitch and other services they use. Spotify Premium, catalog availability and successful queueing do not authorize broadcasting.
 
-## Скриншоты
+## Screenshots
 
-Интерфейс **TrackBridge 1.8.8-beta.1**. Снимки из опубликованной версии приложения с демонстрационными данными; реальные аккаунты и токены не показаны.
+TrackBridge **1.9.0-beta.1**, shown with demonstration data.
 
-### Обзор — текущий трек, голосование и очередь
+### Overview
 
-![Обзор — текущий трек, голосование и очередь — 1.8.8-beta.1](assets/interface-overview-1.8.8-ru.png)
+![Overview](assets/interface-overview-1.9.0-en.png)
 
-### Настройки — подключения и параметры
+### Queue and history cleanup
 
-![Настройки — подключения и параметры — 1.8.8-beta.1](assets/interface-settings-1.8.8-ru.png)
+![Queue and history cleanup](assets/interface-queue-1.9.0-en.png)
 
-### О программе — версия, автор, OpenAI Codex и DonateX
+### About and DonateX
 
-![О программе — версия, автор, OpenAI Codex и DonateX — 1.8.8-beta.1](assets/interface-about-1.8.8-ru.png)
+![About and DonateX](assets/interface-about-1.9.0-en.png)
 
-## Команды чата
+## Features
 
-- `!song` или `!nowplaying` — название и ссылка на текущий трек Spotify; общий интервал ответов — 5 секунд.
-- `!skip` или `!voteskip` — голос за пропуск. В автоматическом режиме нужно 50% текущих зрителей с округлением вверх (11 зрителей → 6 голосов). При аудитории меньше 100 зрителей владелец может отключить автоматический режим и задать от 1 до 99 голосов; от 100 зрителей всегда применяется 50%.
-- Число зрителей запрашивается у Twitch при первом голосе, порог фиксируется до смены трека. Если эфир не идёт или счётчик недоступен, новые голоса не принимаются. Повторные голоса одного Twitch user ID не учитываются. После смены трека или возврата к началу песни голоса сбрасываются. Настройки меняются при остановленном приёме.
-- Команды работают после нажатия «Запустить» при активном плеере Spotify. Один раз переподключите Twitch и разрешите чтение и отправку сообщений чата. Пропуск не возвращает баллы за заказ.
+- Direct Spotify track links.
+- Spotify matching for YouTube and YouTube Music links. Text in round or square brackets in YouTube titles is ignored.
+- Automatic point refunds and Twitch chat notifications when no confident match is found.
+- Twitch EventSub with fallback checks for pending redemptions every 10 seconds.
+- Duplicate prevention and manual resolution of uncertain playback requests.
+- System tray support and Windows DPAPI protection for stored tokens.
+- Automatic GitHub release checks, verified downloads and restart-to-install updates.
+- Russian and English UI. Use the RU/EN buttons in the sidebar; changes apply immediately and are saved. Account IDs and custom reward titles are preserved. Earlier log entries stay in their original language. New chat notifications use the selected language.
 
-## Возможности
+## Download
 
-- Прямые ссылки Spotify.
-- Поиск в Spotify по ссылкам YouTube и YouTube Music: текст в круглых и квадратных скобках заголовка игнорируется.
-- Автоматическая проверка и загрузка новых сборок из GitHub Releases с проверкой SHA-256.
-- Русский и английский интерфейс с кнопками RU/EN в боковом меню. Язык применяется сразу и сохраняется, введённые Client ID и собственное название награды не меняются. Старые строки журнала остаются на исходном языке; новые уведомления в чате используют выбранный язык.
-- Возврат баллов и уведомление в чате Twitch, если совпадение не найдено.
-- Получение событий Twitch и резервная проверка незавершённых покупок каждые 10 секунд.
-- Защита от повторного добавления заказа, обработка неоднозначного ответа вручную.
-- Работа в системном трее, хранение токенов с шифрованием Windows DPAPI.
+Get the Windows ZIP from [Releases](https://github.com/Rub1nchik702/TrackBridge/releases). Extract the entire archive to a writable folder and run `TrackBridge.exe`.
 
-## Скачать и запустить
+Requires Windows 10/11, .NET Framework 4.7.2 or later, Spotify Premium and an active Spotify player. Your Twitch channel must support custom Channel Points rewards. The executable has no Windows code-signing certificate. Public-source builds use no obfuscation.
 
-Скачайте архив `TrackBridge-1.8.8-beta.1-win.zip` из раздела **Releases** этого репозитория. Распакуйте его полностью в отдельную папку, доступную для записи, и запустите `TrackBridge.exe`.
+## Setup
 
-Требования: Windows 10/11, .NET Framework 4.7.2 или новее, Spotify Premium и активный плеер Spotify. На Twitch-канале должны быть доступны пользовательские награды за баллы.
+1. Create your own Web API app in the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard). Set the exact redirect URI to `http://127.0.0.1:43821/callback`.
+2. Paste its **Client ID** into TrackBridge, click **Connect Spotify** and authorize in your browser. No Client Secret is needed. If required, add your Spotify account to the developer app's allowed users.
+3. Register a **Public** app in the [Twitch Developer Console](https://dev.twitch.tv/console/apps). If a redirect URL is required, enter `http://localhost:43821`. Device Code Flow does not use this redirect.
+4. Paste the Twitch Client ID and click **Connect Twitch**. Authorize as the channel owner and allow chat messages for refund notifications.
+5. Create a reward through TrackBridge, or select one previously created using the same Twitch Client ID. Require text input and keep redemptions in the request queue.
+6. Open Spotify and start playback on your preferred device. Select the reward in TrackBridge and click **Start**.
+7. Wait for **Requests active · Twitch connected**, then submit a test request using that reward.
 
-Приложение пока не подписано сертификатом Windows. Сборка из опубликованных исходников выполняется без обфускации.
+Connecting accounts does not start request handling. Each broadcaster currently supplies their own developer application IDs.
 
-## Первое подключение
+## Automatic updates
 
-1. В [Spotify Developer Dashboard](https://developer.spotify.com/dashboard) создайте собственное приложение с Web API. Redirect URI должен быть точно `http://127.0.0.1:43821/callback`.
-2. Скопируйте Spotify **Client ID** в TrackBridge и нажмите «Подключить Spotify». Client Secret не нужен. При необходимости добавьте свой Spotify-аккаунт в список разрешённых пользователей приложения.
-3. В [Twitch Developer Console](https://dev.twitch.tv/console/apps) создайте приложение типа **Public**. Если кабинет требует Redirect URL, укажите `http://localhost:43821`; используемый Device Code Flow не использует это перенаправление.
-4. Введите Twitch **Client ID**, нажмите «Подключить Twitch» и подтвердите подключение аккаунтом владельца канала. Разрешение на сообщения в чате нужно для уведомлений о возврате баллов.
-5. Создайте награду через TrackBridge или выберите награду, ранее созданную тем же Twitch Client ID. Награда должна требовать ввод текста и сохранять покупки в очереди запросов.
-6. Откройте Spotify, выберите устройство и включите музыку. В TrackBridge выберите награду и нажмите **«Запустить»**.
-7. Дождитесь сообщения **«Приём заказов активен»**, затем отправьте тестовый заказ через выбранную награду.
+Starting with version 1.8, TrackBridge checks the public `Rub1nchik702/TrackBridge` GitHub Releases feed at startup and every six hours, including beta releases. It downloads a newer Windows archive into `.updates` next to the app and verifies the SHA-256 digest supplied by GitHub.
 
-Подключение аккаунтов само по себе не запускает обработку заказов. Каждый пользователь регистрирует свои приложения: общий Client ID для массового использования не предоставляется.
+When ready, click **Install update** and confirm the restart. Request handling stops cleanly; only packaged application files are replaced. Your `data` folder is preserved. If replacement fails, files already changed are rolled back. You can also click **Check for updates** manually. GitHub outages do not stop song requests.
 
-## Ограничения beta-версии
+Version 1.7 needs a one-time manual upgrade to 1.8 or later. Close the old app, replace its files and keep `data`. The updater requires write access to the installation folder.
 
-- Заказы добавляются в конец существующей ручной очереди Spotify. Подтверждение награды означает добавление трека, а не его полное проигрывание.
-- Поиск по названию может не найти песню, которая фактически есть в каталоге. Прямая ссылка Spotify надёжнее.
-- Если ответ Spotify потерян, заказ получает статус «Проверьте вручную». Проверьте очередь Spotify и выберите подтверждение или возврат через контекстное меню заказа.
-- После запуска обрабатываются также незавершённые покупки выбранной награды, сделанные во время простоя. Ненужные покупки заранее отклоните в Twitch.
+## Beta limitations
 
-OBS-карточка и кликабельное Twitch-расширение не входят в этот выпуск.
+- Matching may miss a song that exists in Spotify. Direct Spotify links are more reliable.
+- Songs are appended to the existing queue. Reward fulfillment confirms that Spotify accepted the queue request, not that the song played to completion.
+- If a Spotify response is lost, the request is marked **Check manually** instead of being resent. Inspect the Spotify queue and use the request's context menu to confirm or refund it.
+- Starting the app also recovers pending redemptions for the selected reward, including purchases made while the app was closed. Cancel unwanted redemptions in Twitch before starting.
+- OBS now-playing output and a clickable Twitch Extension are not included in this release.
 
-## Данные и безопасность
+## Privacy and support
 
-Токены, Client ID и история заказов находятся в `data/settings.bin` рядом с программой и защищены DPAPI для текущего пользователя Windows. Не публикуйте и не передавайте папку `data`. Шифрование не защищает от программ, работающих с правами того же пользователя Windows.
+Client IDs, tokens and request history are stored in `data/settings.bin`, protected using Windows DPAPI for the current Windows account. Do not upload or share `data`. DPAPI does not protect against software running as the same Windows user. To reset, close TrackBridge and rename `data`. Account access can be revoked in Twitch and Spotify settings.
 
-Обновления проверяются автоматически при запуске и каждые шесть часов в публичном репозитории Rub1nchik702/TrackBridge (учитываются и beta-релизы). Новая сборка автоматически загружается в `.updates` рядом с программой и проверяется по SHA-256, опубликованному GitHub. Когда она готова, нажмите «Установить обновление»: приложение запросит перезапуск, остановит приём и заменит только файлы дистрибутива. Папка `data` сохраняется; при ошибке замены уже изменённые файлы откатываются. Нужен доступ на запись в папку приложения. Если GitHub недоступен, заказы продолжают обрабатываться. Проверить обновление вручную можно кнопкой «Проверить обновления». Версию 1.8 нужно установить вручную один раз: в 1.7 обновляющего механизма ещё нет. Для ручного обновления закройте TrackBridge и замените `TrackBridge.exe`, сохранив папку `data`. Для сброса настроек закройте программу и переименуйте `data`. Доступ к аккаунтам можно отозвать в настройках подключённых приложений Twitch и Spotify.
+When reporting a problem, include the version, steps and sanitized log lines. Do not share settings files, tokens, authorization codes, Client Secrets or viewers' private information.
 
-Сообщая об ошибке, приложите версию, шаги воспроизведения и очищенные строки журнала. Не отправляйте токены, файлы настроек, коды авторизации или Client Secret.
+## License
 
-## Лицензия и распространение
+By **Rub1nchik**. See [LICENSE.txt](LICENSE.txt) and [THIRD-PARTY-NOTICES.txt](THIRD-PARTY-NOTICES.txt). Source is available in [src](src) for inspection and private personal modifications under [LICENSE.txt](LICENSE.txt). Selling the software or distributing modified binaries or source requires written permission from Rub1nchik. The TrackBridge name and logo identify official releases; they may not be used to impersonate them. This is source-available, not OSI open source.
 
-Исходники TrackBridge доступны в [src](src) для изучения и личных изменений на условиях [LICENSE.txt](LICENSE.txt). Продажа и распространение изменённых сборок или исходников без письменного разрешения Rub1nchik запрещены. Название и логотип сохраняются за официальными выпусками. Это source-available, а не OSI open source.
+TrackBridge controls your own Spotify player and does not grant broadcasting rights. Premium does not authorize streaming music to an audience. Follow [Spotify's policies](https://developer.spotify.com/policy) and Twitch's rules. TrackBridge is not affiliated with Spotify, Twitch, YouTube. The app is free to use. Optional DonateX support is available from About; donating is not required to use the app.
 
-Приложение управляет вашим Spotify и не предоставляет прав на передачу музыки в эфир. Premium не заменяет права на вещание. Пользователь должен соблюдать правила [Spotify](https://developer.spotify.com/policy) и Twitch. TrackBridge не является официальным продуктом Spotify, Twitch, YouTube.
+## Queue and updater protections in 1.8.2
 
-Приложение доступно бесплатно. Добровольно поддержать автора можно через DonateX в разделе «О программе»; пожертвование не требуется для использования.
+The app retains up to 100 active requests, 500 completed history entries and 5000 recent receipt IDs. Each viewer can have up to three active requests. When the global queue is full, additional redemptions remain pending in Twitch until space becomes available. Temporary failures are deferred rather than blocking the queue; after three failed attempts a refund is requested. Failed Twitch finalization requires manual resolution.
 
-## Защита очереди и обновлений с 1.8.2
+Future updates require a publisher-signed RSA/SHA-256 manifest verified against a pinned public key. For a trusted transition, install 1.8.2 manually from a trusted package: 1.8 and 1.8.1 cannot verify publisher signatures. This package signature is separate from Windows Authenticode code signing.
 
-Одновременно в приложении хранится до 100 активных заказов и 500 завершённых записей, журнал идентификаторов дедупликации ограничен 5000 записями. До трёх активных заказов на зрителя; лишние принятые запросы отклоняются с возвратом баллов. При заполнении общей очереди новые покупки остаются в очереди Twitch до освобождения места — это не автоматический возврат. Заказ с временной ошибкой откладывается, а после трёх неудачных попыток направляется на возврат; если Twitch не может завершить обработку, потребуется ручное решение.
+## Chat commands
 
-Начиная с 1.8.2, будущие обновления требуют независимую подпись издателя RSA/SHA-256 с закреплённым публичным ключом. Для доверенного перехода с 1.8/1.8.1 установите 1.8.2 вручную из доверенного дистрибутива: старые версии ещё не умеют проверять подпись. Это отдельная подпись пакета обновления, не сертификат Authenticode для Windows.
+- `!song` or `!nowplaying` replies with the current Spotify track and link, with a shared 5-second reply cooldown.
+- `!skip` or `!voteskip` votes to skip. Automatic mode requires 50% of viewers, rounded up (11 viewers → 6 votes). Below 100 viewers, the owner can choose a manual threshold of 1–99 votes. At 100 or more viewers, 50% always applies.
+- Twitch viewer count is fetched at the first vote and the threshold is fixed for that track. No new votes are accepted without a live viewer count. Duplicate Twitch user IDs are ignored. Votes reset on track changes or rewinding to the beginning. Change settings while stopped. Skipping does not refund channel points.
+- Click Start and keep Spotify active. Reconnect Twitch once to grant permission to read and send chat messages.
 
-## Управление и модерация
+## Controls and moderation
 
-Панель показывает текущий трек, число зрителей Twitch и прогресс голосования. Нажатие на трек открывает Spotify. Число зрителей обновляется примерно каждые 30 секунд; порог голосования сохраняется до конца трека.
+The live panel shows the current track, Twitch viewer count and vote progress. Click the track to open Spotify. Viewer count refreshes about every 30 seconds; the vote threshold remains fixed for the track.
 
-Кнопки «Пропустить трек» и «Сбросить голоса» доступны при запущенном приёме. Переключатель отключает голосование зрителей, сохраняя команды текущего трека. Сброс голосов не снимает защиту от повторного запроса пропуска при неоднозначном ответе Spotify.
+Use Skip track or Reset votes while requests are running. Voting enabled can disable viewer votes while keeping song commands. Resetting votes does not unlock a skip with an uncertain Spotify response.
 
-В «Модерация заказов» при остановленном приёме задаются лимит длительности (по умолчанию 10 минут, 0 — без лимита), запрет Explicit и списки запрещённых треков/исполнителей. По одной записи на строку; точное совпадение без учёта регистра. Для трека используйте ссылку Spotify или точное название; запрет по названию распространяется на всех исполнителей. Для исполнителя укажите точное имя Spotify. Explicit определяется только отметкой Spotify и не гарантирует фильтрацию всех нежелательных текстов.
+While stopped, open Request moderation to set a duration limit (10 minutes by default; 0 disables it), block Explicit tracks, and edit blocked track/artist lists. Use one entry per line. Matching is exact and case insensitive. Tracks accept Spotify links or exact titles; title bans apply to all artists. Artist entries use the exact Spotify name. Explicit relies on Spotify metadata and cannot guarantee filtering every unwanted lyric.
 
-Правила применяются к новым и ожидающим отправки заказам, включая прямые ссылки Spotify. Уже добавленные в Spotify треки не удаляются. За отклонённые заказы возвращаются баллы; недоступные данные Spotify обрабатываются как временная ошибка.
+Rules apply before queueing pending and new requests, including direct Spotify links. Tracks already queued are not removed. Rejected orders refund points; unavailable metadata is handled as a temporary failure.
 
-## Интерфейс
+## Interface
 
-В боковом меню: «Обзор», «Очередь», «Модерация» и «Настройки». Подключение аккаунтов, награда Twitch, порог голосования и обновления находятся в «Настройки». Запуск и остановка приёма — в «Обзор».
+Use Overview, Queue, Moderation and Settings in the sidebar. Settings contains account connections, the Twitch reward, voting threshold and updates. Start and stop requests from Overview.
 
-Карточка плеера показывает название, исполнителя, доступную обложку Spotify и прогресс воспроизведения. Карточка голосования отображает голоса и фиксированный порог. Новый логотип моста со звуковой волной используется также в иконке программы и трея.
+The player card shows the track title, artist, Spotify cover when available and playback progress. The voting card displays votes and the fixed threshold. The bridge and waveform logo is also used for the application and tray icons.
 
-## Сборка из исходников
+## Build from source
 
-На Windows запустите `powershell -NoProfile -File .\build.ps1`. Требуется .NET Framework 4.7.2 или новее с компилятором C#. Результат находится в `dist`. GitHub Actions выполняет ту же сборку при изменениях main и по ручному запуску, без обфускации. Артефакт привязан к коммиту; побайтовая воспроизводимость не заявляется.
+On Windows run `powershell -NoProfile -File .\build.ps1` with .NET Framework 4.7.2 or newer and its C# compiler. Output goes to `dist`. GitHub Actions builds the same source on main pushes and manual dispatch, without obfuscation. Artifacts are associated with a commit; byte-for-byte reproducibility is not claimed.
 
-Workflow не получает секретов и не подписывает автообновления. Артефакты Actions предназначены для ручной установки; официальный пакет автообновления дополнительно подписывается автором вне CI. В src/SigningKey.cs находится только публичный ключ проверки, не секрет. Не публикуйте data, .updates, токены, приватные ключи и локальную историю. Изучение кода не является гарантией безопасности любой сторонней сборки.
+The workflow receives no secrets and does not sign updater packages. Actions artifacts are for manual installation; official automatic updates are additionally signed by the author outside CI. src/SigningKey.cs contains only the public verification key. Never publish data, .updates, tokens, private keys or local history. Available source does not guarantee that any third-party binary is safe.
 
-## Участники
+## Contributors
 
-- **Rub1nchik** — автор и владелец TrackBridge.
-- **OpenAI Codex** — помощь в разработке, оформлении интерфейса и документации.
+- **Rub1nchik** — author and owner of TrackBridge.
+- **OpenAI Codex** — assistance with development, interface design and documentation.
 
-## О программе
+## About
 
-В боковом меню «О программе» указаны текущая версия, автор Rub1nchik и помощь OpenAI Codex. Кнопка DonateX открывает страницу добровольной поддержки: https://donatex.gg/donate/rub1nchik.
+The About page in the sidebar shows the current version, author Rub1nchik and OpenAI Codex assistance. The DonateX button opens voluntary support at https://donatex.gg/donate/rub1nchik.
+
+## Event log
+
+The event log has its own sidebar page with wrapped lines, optional auto-scroll, copy and clear controls. It is kept in memory for the current session with bounded history. Remove personal information before sharing.
+
+## Request history cleanup
+
+Clear played tracks hides requests that TrackBridge observed playing and subsequently leaving playback (including skips). A selected played entry can also be hidden. Auto-hide is optional and saved. This cleans TrackBridge history, not the Spotify queue. Current tracks and pending or uncertain requests are protected. Playback that happened while the app was stopped is not guessed retroactively.

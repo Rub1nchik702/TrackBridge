@@ -17,13 +17,14 @@ public class Token { public string access_token = ""; public string refresh_toke
 public class Order {
  public int attempts;
  public long nextAttempt,created;
- public bool notify, notificationAttempted;
+ public bool notify, notificationAttempted,played,historyHidden;
  public string id, reward, broadcaster, user, input, uri, status, note,trackTitle,trackArtist;
  public string time = DateTime.Now.ToString("g");
 }
 public class Settings {
  public List<string> recentReceipts=new List<string>();
  public string language="ru";
+ public bool autoHidePlayed;
  public bool chatAllowed;
  public bool chatReadAllowed;
  public bool skipAutomatic=true;
@@ -55,6 +56,22 @@ public partial class Engine : IDisposable {
  public readonly object Gate = new object();
  readonly SemaphoreSlim auth = new SemaphoreSlim(1,1);
  readonly HttpClient http = new HttpClient(new HttpClientHandler { AllowAutoRedirect=false }) { Timeout=TimeSpan.FromSeconds(20) };
+ string observedOrder="",observedUri="";
+ public void ObserveOrderedPlayback(string uri,bool playing,bool restarted=false){
+  if(string.IsNullOrEmpty(uri))return;
+  lock(Gate){
+   bool changed=false;
+   if(observedOrder!="" && (observedUri!=uri || restarted)){
+    var previous=S.orders.FirstOrDefault(o=>o.id==observedOrder);if(previous!=null){previous.played=true;changed=true;}observedOrder="";observedUri="";
+   }
+   if(playing && observedOrder==""){
+    var current=S.orders.FirstOrDefault(o=>o.uri==uri && !o.played && !o.historyHidden && (o.status=="done" || o.status=="queued"));if(current!=null){observedOrder=current.id;observedUri=uri;}
+   }
+   if(changed)Save();
+  }
+ }
+ public bool CanHideOrder(Order order){return order.status=="done" && order.played && order.id!=observedOrder;}
+ public int HidePlayedOrders(string id=null){lock(Gate){int count=0;foreach(var order in S.orders.Where(o=>!o.historyHidden && CanHideOrder(o) && (id==null || o.id==id))){order.historyHidden=true;count++;}if(count>0)Save();return count;}}
  readonly string path;
  public static long Now { get { return DateTimeOffset.UtcNow.ToUnixTimeSeconds(); } }
  public static Dictionary<string,object> Obj(string s) { return new JavaScriptSerializer().Deserialize<Dictionary<string,object>>(s); }
