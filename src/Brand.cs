@@ -3,6 +3,12 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 namespace TrackBridge {
 public static class Brand {
+ public static Icon LoadIcon(){
+  using(var stream=typeof(Brand).Assembly.GetManifestResourceStream("TrackBridge.AppIcon")){
+   if(stream==null)throw new InvalidOperationException("TrackBridge application icon is missing.");
+   using(var icon=new Icon(stream))return (Icon)icon.Clone();
+  }
+ }
  public static void Draw(Graphics g,Rectangle bounds){
   var state=g.Save();g.SmoothingMode=SmoothingMode.AntiAlias;
   float scale=Math.Min(bounds.Width,bounds.Height)/100f;g.TranslateTransform(bounds.X+(bounds.Width-100*scale)/2,bounds.Y+(bounds.Height-100*scale)/2);g.ScaleTransform(scale,scale);

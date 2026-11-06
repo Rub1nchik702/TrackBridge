@@ -1,5 +1,10 @@
 # Изменения
 
+## 1.9.0.2 — 6 November 2026
+
+- Embedded the application icon for the main window, Windows taskbar and system tray.
+- Added filled Spotify and Twitch developer app forms to the illustrated setup guide.
+
 ## 1.9.0.1 — 6 November 2026
 
 - Published as a regular stable release.

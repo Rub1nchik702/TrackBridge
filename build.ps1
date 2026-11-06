@@ -9,8 +9,9 @@ if (!$version) { throw 'Version is missing.' }
 $stage = Join-Path $OutputDirectory 'TrackBridge'
 New-Item -ItemType Directory -Path $stage -Force | Out-Null
 $icon = Join-Path $PSScriptRoot 'assets\TrackBridge.ico'
+$iconResource = '/resource:' + $icon + ',TrackBridge.AppIcon'
 $exe = Join-Path $stage 'TrackBridge.exe'
-& $compiler /nologo /target:winexe /optimize+ /debug- /utf8output /win32icon:$icon /r:System.Windows.Forms.dll /r:System.Drawing.dll /r:System.Net.Http.dll /r:System.Web.dll /r:System.Web.Extensions.dll /r:System.Security.dll /r:System.IO.Compression.dll /r:System.IO.Compression.FileSystem.dll /out:$exe $files
+& $compiler /nologo /target:winexe /optimize+ /debug- /utf8output /win32icon:$icon $iconResource /r:System.Windows.Forms.dll /r:System.Drawing.dll /r:System.Net.Http.dll /r:System.Web.dll /r:System.Web.Extensions.dll /r:System.Security.dll /r:System.IO.Compression.dll /r:System.IO.Compression.FileSystem.dll /out:$exe $files
 if ($LASTEXITCODE -ne 0) { throw 'Compilation failed.' }
 $documents = @('README.md','README.en.md','README.ru.md','LICENSE.txt','THIRD-PARTY-NOTICES.txt','CHANGELOG.md','TRADEMARKS.md')
 foreach ($file in $documents) { Copy-Item -LiteralPath (Join-Path $PSScriptRoot $file) -Destination (Join-Path $stage $file) -Force }

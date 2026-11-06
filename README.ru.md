@@ -4,7 +4,7 @@
 
 <img src="assets/TrackBridge-icon.png" width="96" alt="TrackBridge icon">
 
-**Автор: Rub1nchik · Windows · Версия 1.9.0.1**
+**Автор: Rub1nchik · Windows · Версия 1.9.0.2**
 
 TrackBridge связывает пользовательскую награду за баллы Twitch с очередью вашего Spotify. Зритель отправляет ссылку на песню, программа ищет соответствующий трек в Spotify и добавляет его в конец очереди. Текущая песня не прерывается.
 
@@ -48,7 +48,7 @@ TrackBridge **1.9.0-beta.1**, демонстрационные данные.
 
 ## Скачать и запустить
 
-Скачайте архив `TrackBridge-1.9.0.1-win.zip` из раздела **Releases** этого репозитория. Распакуйте его полностью в отдельную папку, доступную для записи, и запустите `TrackBridge.exe`.
+Скачайте архив `TrackBridge-1.9.0.2-win.zip` из раздела **Releases** этого репозитория. Распакуйте его полностью в отдельную папку, доступную для записи, и запустите `TrackBridge.exe`.
 
 Требования: Windows 10/11, .NET Framework 4.7.2 или новее, Spotify Premium и активный плеер Spotify. На Twitch-канале должны быть доступны пользовательские награды за баллы.
 
@@ -76,6 +76,12 @@ TrackBridge **1.9.0-beta.1**, демонстрационные данные.
 | Redirect URI | `http://127.0.0.1:43821/callback` |
 | API | Web API |
 
+Пример заполненной формы Spotify (веб-сайт можно указать как ссылку на проект):
+
+![Создание приложения Spotify — название, описание, сайт и Redirect URI](assets/setup-spotify-create-app.jpg)
+
+Выберите **Web API**. Прочитайте условия Spotify, подтвердите их самостоятельно и нажмите **Save**:
+
 Сохраните приложение и скопируйте **Client ID**. Вставьте его в **Spotify Client ID**, нажмите **Подключить Spotify** и разрешите доступ в браузере. Не закрывайте TrackBridge до возврата на локальный адрес. Client Secret не нужен. Требуется Spotify Premium. Если Dashboard требует добавить разрешённого пользователя, добавьте подключаемый аккаунт Spotify. Подробнее: [создание приложения](https://developer.spotify.com/documentation/web-api/concepts/apps), [Redirect URI](https://developer.spotify.com/documentation/web-api/concepts/redirect_uri).
 
 Затем откройте [Twitch Developer Console](https://dev.twitch.tv/console/apps), войдите аккаунтом владельца канала и зарегистрируйте приложение:
@@ -86,6 +92,10 @@ TrackBridge **1.9.0-beta.1**, демонстрационные данные.
 | OAuth Redirect URL | `http://localhost:43821`, если поле требуется; нажмите «Добавить» и сохраните |
 | Category | Подходящая категория интеграции, например Application Integration, если доступна |
 | Client type | Public / «Виден всем» |
+
+Пример формы Twitch: **Application Integration**, тип клиента **Public / «виден всем»**. Название должно быть свободным; замените YourChannel своим названием. Нажмите **Создать**, затем откройте управление приложением и скопируйте Client ID:
+
+![Создание приложения Twitch — название, Redirect URL, категория и Public](assets/setup-twitch-create-app.jpg)
 
 Скопируйте **Client ID** в **Twitch Client ID**, нажмите **Подключить Twitch** и подтвердите доступ аккаунтом владельца канала. Разрешите запрошенный доступ к чату для ответов о текущем треке и уведомлений о возврате баллов. Если показан код устройства, введите актуальный код на странице активации Twitch. Подробнее: [регистрация приложения](https://dev.twitch.tv/docs/authentication/register-app), [Device Code Flow](https://dev.twitch.tv/docs/authentication/getting-tokens-oauth/#device-code-grant-flow).
 
