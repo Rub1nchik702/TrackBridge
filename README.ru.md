@@ -14,19 +14,19 @@ TrackBridge только управляет очередью и воспроиз
 
 ## Скриншоты
 
-TrackBridge **1.9.0-beta.1**, демонстрационные данные.
+TrackBridge **1.9.0.2**, демонстрационные данные.
 
 ### Обзор
 
-![Обзор](assets/interface-overview-1.9.0-ru.png)
+![Обзор](assets/interface-overview-1.9.0.2-ru.png)
 
 ### Очередь и очистка истории
 
-![Очередь и очистка истории](assets/interface-queue-1.9.0-ru.png)
+![Очередь и очистка истории](assets/interface-queue-1.9.0.2-ru.png)
 
 ### О программе и DonateX
 
-![О программе и DonateX](assets/interface-about-1.9.0-ru.png)
+![О программе и DonateX](assets/interface-about-1.9.0.2-ru.png)
 
 ## Команды чата
 
@@ -56,7 +56,7 @@ TrackBridge **1.9.0-beta.1**, демонстрационные данные.
 
 ## Настройка по шагам
 
-На скриншотах показана TrackBridge 1.9.0.1 с демонстрационными данными. Вместо примерных Client ID вставьте свои. Реальные аккаунты и токены авторизации на изображениях не используются.
+На скриншотах показана TrackBridge 1.9.0.2 с демонстрационными данными. Вместо примерных Client ID вставьте свои. Реальные аккаунты и токены авторизации на изображениях не используются.
 
 ### 1. Откройте настройки
 
@@ -78,7 +78,7 @@ TrackBridge **1.9.0-beta.1**, демонстрационные данные.
 
 Пример заполненной формы Spotify (веб-сайт можно указать как ссылку на проект):
 
-![Создание приложения Spotify — название, описание, сайт и Redirect URI](assets/setup-spotify-create-app.jpg)
+![Создание приложения Spotify — название, описание, сайт и Redirect URI](assets/setup-spotify-create-app-en.jpg)
 
 Выберите **Web API**. Прочитайте условия Spotify, подтвердите их самостоятельно и нажмите **Save**:
 
@@ -95,7 +95,7 @@ TrackBridge **1.9.0-beta.1**, демонстрационные данные.
 
 Пример формы Twitch: **Application Integration**, тип клиента **Public / «виден всем»**. Название должно быть свободным; замените YourChannel своим названием. Нажмите **Создать**, затем откройте управление приложением и скопируйте Client ID:
 
-![Создание приложения Twitch — название, Redirect URL, категория и Public](assets/setup-twitch-create-app.jpg)
+![Создание приложения Twitch — название, Redirect URL, категория и Public](assets/setup-twitch-create-app-en.jpg)
 
 Скопируйте **Client ID** в **Twitch Client ID**, нажмите **Подключить Twitch** и подтвердите доступ аккаунтом владельца канала. Разрешите запрошенный доступ к чату для ответов о текущем треке и уведомлений о возврате баллов. Если показан код устройства, введите актуальный код на странице активации Twitch. Подробнее: [регистрация приложения](https://dev.twitch.tv/docs/authentication/register-app), [Device Code Flow](https://dev.twitch.tv/docs/authentication/getting-tokens-oauth/#device-code-grant-flow).
 

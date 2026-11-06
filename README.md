@@ -14,19 +14,19 @@ TrackBridge only controls the queue and playback in your own Spotify player; it 
 
 ## Screenshots
 
-TrackBridge **1.9.0-beta.1**, shown with demonstration data.
+TrackBridge **1.9.0.2**, shown with demonstration data.
 
 ### Overview
 
-![Overview](assets/interface-overview-1.9.0-en.png)
+![Overview](assets/interface-overview-1.9.0.2-en.png)
 
 ### Queue and history cleanup
 
-![Queue and history cleanup](assets/interface-queue-1.9.0-en.png)
+![Queue and history cleanup](assets/interface-queue-1.9.0.2-en.png)
 
 ### About and DonateX
 
-![About and DonateX](assets/interface-about-1.9.0-en.png)
+![About and DonateX](assets/interface-about-1.9.0.2-en.png)
 
 ## Features
 
@@ -47,7 +47,7 @@ Requires Windows 10/11, .NET Framework 4.7.2 or later, Spotify Premium and an ac
 
 ## Setup
 
-Screenshots below show TrackBridge 1.9.0.1 with demonstration data. Replace the example Client IDs with your own; the images do not show real accounts or authorization tokens.
+Screenshots below show TrackBridge 1.9.0.2 with demonstration data. Replace the example Client IDs with your own; the images do not show real accounts or authorization tokens.
 
 ### 1. Open Settings
 
@@ -69,7 +69,7 @@ First open the [Spotify Developer Dashboard](https://developer.spotify.com/dashb
 
 Example Spotify form with the name, description, project website and redirect URI filled in:
 
-![Spotify app creation — name, description, website and redirect URI](assets/setup-spotify-create-app.jpg)
+![Spotify app creation — name, description, website and redirect URI](assets/setup-spotify-create-app-en.jpg)
 
 Select **Web API**. Read Spotify's terms, accept them yourself, and click **Save**:
 
@@ -84,9 +84,9 @@ Then open the [Twitch Developer Console](https://dev.twitch.tv/console/apps), si
 | Category | An appropriate integration category, such as Application Integration if offered |
 | Client type | Public |
 
-Example Twitch form (shown in Russian): select **Application Integration** and **Public** (виден всем). Use an available name; replace YourChannel with your own name. Click **Create**, then open the app's management page to copy its Client ID:
+Example Twitch form: select **Application Integration** and **Public**. Use an available name; replace YourChannel with your own name. Click **Create**, then open the app's management page to copy its Client ID:
 
-![Twitch app creation — name, redirect URL, category and Public client type](assets/setup-twitch-create-app.jpg)
+![Twitch app creation — name, redirect URL, category and Public client type](assets/setup-twitch-create-app-en.jpg)
 
 Copy its **Client ID** into **Twitch Client ID**, click **Connect Twitch**, and follow the browser instructions to authorize the channel owner's account. Allow the requested chat access so song replies and refund notifications can work. If a device code is shown, enter that current code on Twitch's activation page. See [Twitch app registration](https://dev.twitch.tv/docs/authentication/register-app) and [Device Code Flow](https://dev.twitch.tv/docs/authentication/getting-tokens-oauth/#device-code-grant-flow).
 
