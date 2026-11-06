@@ -8,6 +8,10 @@
 
 TrackBridge connects a custom Twitch Channel Points reward to your Spotify queue. Viewers submit a song link, the app finds a matching Spotify track and adds it to the end of your queue without interrupting the current song.
 
+## Music rights and broadcasting
+
+TrackBridge only controls the queue and playback in your own Spotify player; it does not transmit an audio stream to viewers. It does not grant rights to music or permission to use it in broadcasts, live streams or recordings. Users are responsible for obtaining the necessary rights and permissions and complying with rights holders’ rights, applicable law and the terms of Spotify, Twitch and other services they use. Spotify Premium, catalog availability and successful queueing do not authorize broadcasting.
+
 ## Screenshots
 
 Overview and settings in version 1.8.6, shown with demonstration data.
