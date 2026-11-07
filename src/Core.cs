@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Text;
 using System.Linq;
@@ -23,7 +23,7 @@ public class Order {
 }
 public class Settings {
  public List<string> recentReceipts=new List<string>();
- public string language="ru";
+ public string language=System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName=="ru"?"ru":"en";
  public bool autoHidePlayed;
  public bool requestSoundEnabled=true;
  public int requestSoundVolume=20;
@@ -80,7 +80,7 @@ public partial class Engine : IDisposable {
  readonly string path;
  public string RequestSoundFile {get{return string.IsNullOrEmpty(S.requestSoundName)?null:Path.Combine(Path.GetDirectoryName(path),"request-notification.wav");}}
  public void SetRequestSound(string selectedFile){
-  byte[] wave=NotificationSound.ImportWave(selectedFile);string destination=Path.Combine(Path.GetDirectoryName(path),"request-notification.wav");
+  byte[] wave=AudioImport.ConvertFile(selectedFile);string destination=Path.Combine(Path.GetDirectoryName(path),"request-notification.wav");
   File.WriteAllBytes(destination+".tmp",wave);if(File.Exists(destination))File.Replace(destination+".tmp",destination,null);else File.Move(destination+".tmp",destination);
   S.requestSoundName=Path.GetFileName(selectedFile);Save();
  }
@@ -336,4 +336,3 @@ public partial class Engine : IDisposable {
  public void Dispose() { http.Dispose(); auth.Dispose(); }
 }
 }
-

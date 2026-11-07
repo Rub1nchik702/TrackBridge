@@ -1,3 +1,5 @@
+**Spotify Premium required. Adding tracks to the Spotify queue requires Premium.**
+
 # TrackBridge
 
 **Windows · 1.10.0 · by Rub1nchik**
@@ -15,7 +17,7 @@ Twitch Channel Points song requests → your Spotify queue. Viewers submit a lin
 - Spotify links and Spotify matching for YouTube / YouTube Music links.
 - Refunds for rejected requests, moderation rules and duplicate prevention.
 - `!song` / `!nowplaying` for the current track; `!skip` / `!voteskip` for skip voting.
-- Quiet notification sound: adjustable volume, your own WAV, or the built-in chime.
+- Quiet notification sound: adjustable volume, your own audio file, or the built-in chime.
 - Request checkboxes, bulk history hiding, played-history cleanup, RU/EN UI and updates.
 
 ## Get started
@@ -28,7 +30,7 @@ Requires Windows 10/11, .NET Framework 4.7.2+, Spotify Premium and a Twitch chan
 
 ## Sound and history
 
-**Settings → Choose WAV…** selects a custom 16-bit PCM WAV (mono/stereo, up to 5 seconds / 2 MB). **Default sound** restores the built-in chime. The chosen file is copied into `data` and the volume setting applies to it.
+**Settings → Choose audio…** selects a custom MP3 or another format supported by Windows; up to 50 MB. The first five seconds are converted locally to WAV. **Default sound** restores the built-in chime. The chosen file is copied into `data` and the volume setting applies to it.
 
 Check request rows, then click **Hide selected** to hide them from the list. This does not cancel requests or remove Spotify songs. **Clear played tracks** only clears entries whose playback TrackBridge observed.
 
@@ -46,6 +48,6 @@ Source is available in [src](src). Build on Windows with `powershell -NoProfile 
 
 TrackBridge controls your Spotify player and grants no music or broadcasting rights. Users must obtain the necessary permissions and follow service terms.
 
-[Full guide](https://github.com/Rub1nchik702/TrackBridge/blob/main/docs/GUIDE.md) · [Changelog](CHANGELOG.md) · [Voluntary DonateX support](https://donatex.gg/donate/rub1nchik)
+[Full guide](https://github.com/Rub1nchik702/TrackBridge/blob/main/docs/GUIDE.md) · [Changelog](CHANGELOG.md) · [Project repository](https://github.com/Rub1nchik702/TrackBridge)
 
 Author: **Rub1nchik**. Development assistance: **OpenAI Codex**.

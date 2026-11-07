@@ -1,3 +1,5 @@
+**Spotify Premium required. Adding tracks to the Spotify queue requires Premium.**
+
 # TrackBridge
 
 [Русский](GUIDE.ru.md) · **English** · [Home](../README.md)
@@ -24,13 +26,15 @@ TrackBridge **1.10.0**, shown with demonstration data.
 
 ![Queue and history cleanup](../assets/interface-queue-1.10.0-en.png)
 
-### About and DonateX
+### About and GitHub
 
-![About and DonateX](../assets/interface-about-1.10.0-en.png)
+![About and GitHub](../assets/interface-about-1.10.0-en.png)
 
 ## Custom notification sound
 
-In Settings, choose **Choose WAV…** to replace the built-in chime, or **Default sound** to restore it. Supported files: 16-bit PCM WAV, mono or stereo, up to 5 seconds and 2 MB. TrackBridge stores a copy in its data folder, so moving the original file does not break the selected sound. The sound choice survives restart and normal application updates. The volume control applies to both sounds. If the custom file becomes unavailable or damaged, the built-in signal is used.
+In Settings, choose **Choose audio…** to import an MP3 or another format supported by your Windows codecs (for example M4A/AAC, FLAC, WMA or WAV). Files may be up to 50 MB. The first five seconds are converted locally to a small WAV notification; your original file is not changed. Not every audio format is supported on every Windows installation.
+
+The converted copy is stored in `data`, so moving the original file does not break your sound. Volume applies to both custom and built-in sounds. Use **Default sound** to restore the original chime. If a saved sound becomes unavailable, the built-in chime is used.
 
 ![Custom sound controls](../assets/interface-settings-1.10.0-en.png)
 
@@ -145,7 +149,7 @@ When reporting a problem, include the version, steps and sanitized log lines. Do
 
 By **Rub1nchik**. See [LICENSE.txt](../LICENSE.txt) and [THIRD-PARTY-NOTICES.txt](../THIRD-PARTY-NOTICES.txt). Source is available in [src](../src) for inspection and private personal modifications under [LICENSE.txt](../LICENSE.txt). Selling the software or distributing modified binaries or source requires written permission from Rub1nchik. The TrackBridge name and logo identify official releases; they may not be used to impersonate them. This is source-available, not OSI open source.
 
-TrackBridge controls your own Spotify player and does not grant broadcasting rights. Premium does not authorize streaming music to an audience. Follow [Spotify's policies](https://developer.spotify.com/policy) and Twitch's rules. TrackBridge is not affiliated with Spotify, Twitch, YouTube. The app is free to use. Optional DonateX support is available from About; donating is not required to use the app.
+TrackBridge controls your own Spotify player and does not grant broadcasting rights. Premium does not authorize streaming music to an audience. Follow [Spotify's policies](https://developer.spotify.com/policy) and Twitch's rules. TrackBridge is not affiliated with Spotify, Twitch, YouTube. The app is free to use.
 
 ## Queue and updater protections in 1.8.2
 
@@ -189,7 +193,7 @@ The workflow receives no secrets and does not sign updater packages. Actions art
 
 ## About
 
-The About page in the sidebar shows the current version, author Rub1nchik and OpenAI Codex assistance. The DonateX button opens voluntary support at https://donatex.gg/donate/rub1nchik.
+The About page in the sidebar shows the current version, author Rub1nchik and OpenAI Codex assistance. The GitHub button opens the project repository: https://github.com/Rub1nchik702/TrackBridge.
 
 ## Event log
 
@@ -198,4 +202,3 @@ The event log has its own sidebar page with wrapped lines, optional auto-scroll,
 ## Request history cleanup
 
 Clear played tracks hides requests that TrackBridge observed playing and subsequently leaving playback (including skips). Check one or more rows, then click Hide selected to hide them from history regardless of status. Highlighted rows are used when no boxes are checked; checkbox choices survive table refreshes. Hiding never cancels requests, refunds points or removes songs from Spotify. Auto-hide is optional and saved. This cleans TrackBridge history, not the Spotify queue. Clear played tracks protects the currently playing track and unplayed or uncertain requests. Playback that happened while the app was stopped is not guessed retroactively.
-

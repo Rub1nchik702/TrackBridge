@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.IO;
 using System.Drawing;
@@ -20,10 +20,11 @@ public partial class MainWindow : Form {
  RichTextBox logs=new RichTextBox();
  readonly System.Collections.Concurrent.ConcurrentQueue<string> pendingLogs=new System.Collections.Concurrent.ConcurrentQueue<string>();
  readonly System.Windows.Forms.Timer logTimer=new System.Windows.Forms.Timer();
- readonly CheckBox autoScrollLog=new CheckBox();
+ readonly CheckBox autoScrollLog=new ModernCheckBox();
  ListView orders=new ListView();
  readonly HashSet<string> checkedOrderIds=new HashSet<string>();
  bool refreshingOrders;
+ bool soundImporting;
  Label requestSoundFileLabel;
  Label status=new Label(),accounts=new Label();
  Button start=new SoftButton(),stop=new SoftButton(),cancelLogin=new SoftButton();
@@ -39,7 +40,7 @@ public partial class MainWindow : Form {
  bool busy,exiting,connecting;
  Label playbackPanel=new Label(),votePanel=new Label();
  ComboBox language=new ComboBox();
- CheckBox skipAutomatic=new CheckBox();
+ CheckBox skipAutomatic=new ModernCheckBox();
  NumericUpDown skipManual=new NumericUpDown();
  bool languageReady;
  readonly bool previewMode;
@@ -127,7 +128,7 @@ public partial class MainWindow : Form {
     check(!login.IsCancellationRequested && !object.ReferenceEquals(login,previous),"retry has fresh cancellation state");previous=login;
    }
    twitch.Text="twitch-id-fixture";spotify.Text="spotify-id-fixture";title.Text="Custom reward title";
-   ChangeLanguage("en");check(navAbout.Text=="About" && Descendants(aboutHost).Any(c=>c.Text=="Support on DonateX ↗"),"About English translations");check(skipAutomatic.Text=="Automatic: 50% of viewers","voting option translated");check(start.Text=="▶ Start" && stop.Text=="■ Stop" && updateButton.Text=="Check for updates","English action labels");
+   ChangeLanguage("en");check(navAbout.Text=="About" && Descendants(aboutHost).Any(c=>c.Text=="Open GitHub ↗"),"About English translations");check(skipAutomatic.Text=="Automatic: 50% of viewers","voting option translated");check(start.Text=="▶ Start" && stop.Text=="■ Stop" && updateButton.Text=="Check for updates","English action labels");
    check(status.Text=="Requests stopped — click Start" && orders.Columns[0].Text=="Time","English dynamic status and columns");
    check(tray.ContextMenuStrip.Items[0].Text=="Open" && orders.ContextMenuStrip.Items[1].Text=="Reject and refund points","English tray and context menu");
    check(twitch.Text=="twitch-id-fixture" && spotify.Text=="spotify-id-fixture" && title.Text=="Custom reward title","language switch preserves input");
@@ -259,4 +260,3 @@ static class Program {
  }
 }
 }
-

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -28,7 +28,7 @@ static class Tests {
   return new Dictionary<string,object>{{"id",id},{"reward",new Dictionary<string,object>{{"id","r"}}},{"user_name","viewer"},{"user_input",input}};
  }
  static async Task RunAsync() {
-  await TestCommands();await TestModeration();TestCleanup();TestLimits();await TestSoundNotifications();TestCustomSound();
+  await TestCommands();await TestModeration();TestCleanup();TestLimits();await TestSoundNotifications();TestCustomSound();AudioDependencies.Initialize();TestAudioConversion();TestDefaultLanguage();
   var request=Engine.Obj(Engine.Json(new {broadcaster_id="test",sender_id="test",message="check"}));
   Check(Engine.Str(request,"broadcaster_id")=="test" && Engine.Str(request,"message")=="check","anonymous API body keeps wire names");
   var settingsRoundTrip=new System.Web.Script.Serialization.JavaScriptSerializer().Deserialize<Settings>(Engine.Json(new Settings()));
@@ -286,6 +286,20 @@ static class Tests {
   byte[] withMetadata;using(var metadata=new MemoryStream())using(var writer=new BinaryWriter(metadata)){writer.Write(standard,0,36);writer.Write(System.Text.Encoding.ASCII.GetBytes("JUNK"));writer.Write(4);writer.Write(new byte[]{1,2,3,4});writer.Write(standard,36,standard.Length-36);withMetadata=metadata.ToArray();}Array.Copy(BitConverter.GetBytes(withMetadata.Length-8),0,withMetadata,4,4);string metadataFile=Path.Combine(dir,"metadata.wav");File.WriteAllBytes(metadataFile,withMetadata);Check(NotificationSound.ImportWave(metadataFile).SequenceEqual(standard),"import strips non-audio metadata chunks");
   byte[] silence=(byte[])standard.Clone();Array.Clear(silence,44,silence.Length-44);string silent=Path.Combine(dir,"silence.wav");File.WriteAllBytes(silent,silence);Check(WavePeak(NotificationSound.WaveForPlayback(40,silent))==0,"silent file does not cause gain errors");
  }
+ static void TestDefaultLanguage(){var before=Thread.CurrentThread.CurrentUICulture;try{foreach(string culture in new[]{"ru-RU","en-US","de-DE"}){Thread.CurrentThread.CurrentUICulture=new System.Globalization.CultureInfo(culture);Check(new Settings().language==(culture=="ru-RU"?"ru":"en"),"system language default "+culture);}}finally{Thread.CurrentThread.CurrentUICulture=before;}}
+ [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+ static void TestAudioConversion(){
+  string dir=Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"diagnostics","audio-import-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(dir);
+  string wav=Path.Combine(dir,"tone.wav"),mp3=Path.Combine(dir,"tone.mp3");
+  var format=new NAudio.Wave.WaveFormat(44100,16,2);using(var writer=new NAudio.Wave.WaveFileWriter(wav,format)){byte[] data=new byte[format.AverageBytesPerSecond*7];for(int i=0;i<data.Length/4;i++){short sample=(short)(Math.Sin(2*Math.PI*440*i/44100)*3000);byte[] bytes=BitConverter.GetBytes(sample);data[i*4]=data[i*4+2]=bytes[0];data[i*4+1]=data[i*4+3]=bytes[1];}writer.Write(data,0,data.Length);}
+  using(var input=new NAudio.Wave.WaveFileReader(wav))NAudio.Wave.MediaFoundationEncoder.EncodeToMp3(input,mp3,128000);
+  byte[] original=File.ReadAllBytes(mp3);using(var e=new Engine(Path.Combine(dir,"data"))){
+   foreach(string source in new[]{wav,mp3}){e.SetRequestSound(source);byte[] converted=NotificationSound.ImportWave(e.RequestSoundFile);Check(BitConverter.ToInt32(converted,24)==22050 && BitConverter.ToInt16(converted,22)==1 && BitConverter.ToInt16(converted,34)==16,"converted audio is mono PCM16 22050: "+Path.GetExtension(source));Check(converted.Length>22050*2*4 && converted.Length<=44+22050*2*5,"import trims audio to five seconds: "+Path.GetExtension(source));Check(WavePeak(converted)>100,"decoded audio contains tone");}
+   Check(original.SequenceEqual(File.ReadAllBytes(mp3)),"MP3 source remains unchanged");Check(e.S.requestSoundName=="tone.mp3","original audio filename retained");
+   string saved=e.RequestSoundFile;byte[] prior=File.ReadAllBytes(saved);string bad=Path.Combine(dir,"not-audio.mp3");File.WriteAllText(bad,"not an audio file");bool rejected=false;try{e.SetRequestSound(bad);}catch(IOException){rejected=true;}Check(rejected && prior.SequenceEqual(File.ReadAllBytes(saved)) && e.S.requestSoundName=="tone.mp3","failed conversion preserves selected sound");
+  }
+  using(var e=new Engine(Path.Combine(dir,"data")))Check(e.S.requestSoundName=="tone.mp3" && NotificationSound.ImportWave(e.RequestSoundFile).Length>44,"converted audio selection survives restart");
+ }
  static void TestCleanup(){
   string dir=Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"diagnostics","cleanup-"+Guid.NewGuid().ToString("N"));
   using(var e=new Engine(dir)){
@@ -362,4 +376,3 @@ static class Tests {
  }
 }
 }
-

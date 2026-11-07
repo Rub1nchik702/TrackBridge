@@ -1,13 +1,28 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 namespace TrackBridge {
 static class L {
- public static string Language="ru";
+ public static string Language=System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName=="ru"?"ru":"en";
  public static string T(string value) {if(value==null)return "";string result;return Language=="en" && English.TryGetValue(value,out result)?result:value;}
  public static string Canonical(string value) {var pair=English.FirstOrDefault(p=>p.Value==value);return pair.Key??value;}
  public static string Runtime(string value) {return T(Canonical(value));}
  public static readonly Dictionary<string,string> English=new Dictionary<string,string> {
+{"Откровенный контент","Explicit content"},
+{"Репозиторий проекта","Project repository"},
+{"Исходный код, обновления и обсуждения TrackBridge на GitHub.","Source code, updates and discussions on GitHub."},
+{"Открыть GitHub ↗","Open GitHub ↗"},
+{"Нужен Spotify Premium","Spotify Premium required"},
+{"Музыка вашего сообщества · нужен Spotify Premium","Music from your community · Spotify Premium required"},
+{"Длительность","Duration"},
+{"Стоп-треки","Blocked tracks"},
+{"Треки в стоп-листе","Blocked tracks"},
+{"Исполнители","Artists"},
+{"Выбрать аудио…","Choose audio…"},
+{"Подготовка сигнала…","Preparing sound…"},
+{"MP3, M4A, AAC, FLAC, WMA, WAV → первые 5 секунд в WAV","MP3, M4A, AAC, FLAC, WMA, WAV → first 5 seconds as WAV"},
+{"Выберите аудиофайл размером до 50 МБ.","Choose an audio file no larger than 50 MB."},
+{"Не удалось прочитать аудио. Формат должен поддерживаться кодеками Windows.","Could not decode audio. The format must be supported by your Windows codecs."},
 {"Выбрать WAV…","Choose WAV…"},
 {"Стандартный сигнал","Default sound"},
 {"Свой сигнал: ","Custom sound: "},
@@ -172,4 +187,3 @@ static class L {
  };
 }
 }
-
