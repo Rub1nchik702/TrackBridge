@@ -15,8 +15,8 @@ public class RewardItem {
 public partial class MainWindow : Form {
  readonly Engine e;
  TextBox twitch=new TextBox(),spotify=new TextBox(),title=new TextBox();
- NumericUpDown cost=new NumericUpDown();
- ComboBox rewards=new ComboBox();
+ NumericUpDown cost=new ThemedNumericUpDown();
+ ComboBox rewards=new ThemedComboBox();
  RichTextBox logs=new RichTextBox();
  readonly System.Collections.Concurrent.ConcurrentQueue<string> pendingLogs=new System.Collections.Concurrent.ConcurrentQueue<string>();
  readonly System.Windows.Forms.Timer logTimer=new System.Windows.Forms.Timer();
@@ -39,9 +39,9 @@ public partial class MainWindow : Form {
  System.Windows.Forms.Timer updateTimer=new System.Windows.Forms.Timer();
  bool busy,exiting,connecting;
  Label playbackPanel=new Label(),votePanel=new Label();
- ComboBox language=new ComboBox();
+ ComboBox language=new ThemedComboBox();
  CheckBox skipAutomatic=new ModernCheckBox();
- NumericUpDown skipManual=new NumericUpDown();
+ NumericUpDown skipManual=new ThemedNumericUpDown();
  bool languageReady;
  readonly bool previewMode;
  public MainWindow(Engine engine,bool preview=false) {
@@ -63,22 +63,16 @@ public partial class MainWindow : Form {
    exiting=true;Enabled=false;updatesCancellation.Cancel();updateTimer.Stop();updateTimer.Dispose();login.Cancel();await Stop();tray.Visible=false;tray.Dispose();Close();
   };
  }
- void Moderation(){
-  if(running!=null)return;
-  using(var dialog=new Form{Text=L.T("Модерация заказов"),Size=new Size(690,650),MinimumSize=new Size(620,600),StartPosition=FormStartPosition.CenterParent,BackColor=BackColor,ForeColor=ForeColor,Font=Font}){
-   var layout=new TableLayoutPanel{Dock=DockStyle.Fill,Padding=new Padding(18),ColumnCount=1,RowCount=8};
-   layout.RowStyles.Add(new RowStyle(SizeType.Absolute,35));layout.RowStyles.Add(new RowStyle(SizeType.Absolute,35));layout.RowStyles.Add(new RowStyle(SizeType.Absolute,48));layout.RowStyles.Add(new RowStyle(SizeType.Percent,50));layout.RowStyles.Add(new RowStyle(SizeType.Absolute,35));layout.RowStyles.Add(new RowStyle(SizeType.Percent,50));layout.RowStyles.Add(new RowStyle(SizeType.Absolute,40));layout.RowStyles.Add(new RowStyle(SizeType.Absolute,44));dialog.Controls.Add(layout);
-   var duration=new FlowLayoutPanel{Dock=DockStyle.Fill};duration.Controls.Add(new Label{Text=L.T("Лимит минут (0 — без лимита):"),AutoSize=true});var minutes=new NumericUpDown{Minimum=0,Maximum=1440,Value=Math.Max(0,Math.Min(1440,e.S.maxTrackMinutes)),Width=80};duration.Controls.Add(minutes);layout.Controls.Add(duration);
-   var explicitBox=new CheckBox{Text=L.T("Запретить треки с отметкой Explicit"),AutoSize=true,Checked=e.S.blockExplicit};layout.Controls.Add(explicitBox);
-   layout.Controls.Add(new Label{Text=L.T("Запрещённые треки: ссылка Spotify или точное название, по одному на строку."),Dock=DockStyle.Fill});
-   var tracks=new TextBox{Multiline=true,ScrollBars=ScrollBars.Vertical,Dock=DockStyle.Fill,MaxLength=20000,Text=e.S.blockedTracks??""};layout.Controls.Add(tracks);
-   layout.Controls.Add(new Label{Text=L.T("Запрещённые исполнители: точное имя, по одному на строку."),Dock=DockStyle.Fill});
-   var artists=new TextBox{Multiline=true,ScrollBars=ScrollBars.Vertical,Dock=DockStyle.Fill,MaxLength=20000,Text=e.S.blockedArtists??""};layout.Controls.Add(artists);
-   layout.Controls.Add(new Label{Text=L.T("Регистр не важен. Отклонённые заказы возвращают баллы."),Dock=DockStyle.Fill});
-   var save=new SoftButton{Text=L.T("Сохранить"),Dock=DockStyle.Right,Width=140};save.Click+=(s,a)=>{e.S.maxTrackMinutes=(int)minutes.Value;e.S.blockExplicit=explicitBox.Checked;e.S.blockedTracks=tracks.Text;e.S.blockedArtists=artists.Text;e.Save();dialog.DialogResult=DialogResult.OK;};Style(save);layout.Controls.Add(save);ThemeInputs(dialog);dialog.ShowDialog(this);
-  }
-  RefreshView();
+ void Moderation(){Bitmap before=CapturePage();foreach(var page in new[]{dashboardHost,settingsHost,aboutHost,logHost})page.Visible=false;moderationHost.Visible=true;moderationEditor.Enabled=running==null;moderationHost.BringToFront();HighlightNavigation(navModeration);AnimatePage(moderationHost,before);}
+ void BuildModerationPage(){
+  var layout=Grid(1,4);layout.Padding=new Padding(18);layout.RowStyles.Add(new RowStyle(SizeType.Absolute,100));layout.RowStyles.Add(new RowStyle(SizeType.Percent,100));layout.RowStyles.Add(new RowStyle(SizeType.Absolute,44));layout.RowStyles.Add(new RowStyle(SizeType.Absolute,46));var page=Grid(1,2);page.Padding=new Padding(8);page.RowStyles.Add(new RowStyle(SizeType.Absolute,70));page.RowStyles.Add(new RowStyle(SizeType.Percent,100));moderationHost.Controls.Add(page);page.Controls.Add(Caption("Модерация заказов",24,true),0,0);page.Controls.Add(layout,0,1);
+  var options=Grid(2,2);options.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute,320));options.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,100));options.RowStyles.Add(new RowStyle(SizeType.Absolute,44));options.RowStyles.Add(new RowStyle(SizeType.Absolute,44));options.Controls.Add(Caption("Лимит минут (0 — без лимита):",11),0,0);var minutes=new ThemedNumericUpDown{Minimum=0,Maximum=1440,Value=Math.Max(0,Math.Min(1440,e.S.maxTrackMinutes)),Width=90,Anchor=AnchorStyles.Left};options.Controls.Add(minutes,1,0);var explicitBox=new ModernCheckBox{Text=L.T("Запретить треки с отметкой Explicit"),Checked=e.S.blockExplicit,Dock=DockStyle.Fill};options.Controls.Add(explicitBox,0,1);options.SetColumnSpan(explicitBox,2);layout.Controls.Add(options,0,0);
+  var columns=Grid(2,1);columns.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,50));columns.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,50));layout.Controls.Add(columns,0,1);
+  var tracks=ModerationColumn(columns,0,"Запрещённые треки","Ссылка Spotify или точное название, по одному на строку.",e.S.blockedTracks);var artists=ModerationColumn(columns,1,"Запрещённые исполнители","Точное имя, по одному на строку.",e.S.blockedArtists);
+  var note=Caption("Регистр не важен. Отклонённые заказы возвращают баллы.",10);note.ForeColor=muted;layout.Controls.Add(note,0,2);
+  var save=new SoftButton{Text=L.T("Сохранить"),Dock=DockStyle.Right,Width=140};Style(save);save.Click+=(sender,args)=>{if(running!=null)return;e.S.maxTrackMinutes=(int)minutes.Value;e.S.blockExplicit=explicitBox.Checked;e.S.blockedTracks=tracks.Text;e.S.blockedArtists=artists.Text;e.Save();Log(L.T("Правила сохранены."));RefreshView();};layout.Controls.Add(save,0,3);moderationEditor=layout;NormalizeLayouts(moderationHost);ThemeInputs(moderationHost);
  }
+ TextBox ModerationColumn(TableLayoutPanel columns,int column,string title,string hint,string value){var card=new Surface{Dock=DockStyle.Fill,Margin=new Padding(column==0?0:7,0,column==0?7:0,0),Padding=new Padding(16)};columns.Controls.Add(card,column,0);var content=Grid(1,3);content.RowStyles.Add(new RowStyle(SizeType.Absolute,34));content.RowStyles.Add(new RowStyle(SizeType.Absolute,54));content.RowStyles.Add(new RowStyle(SizeType.Percent,100));card.Controls.Add(content);content.Controls.Add(Caption(title,14,true),0,0);var help=Caption(hint,10);help.ForeColor=muted;help.AutoEllipsis=false;content.Controls.Add(help,0,1);var input=new TextBox{Multiline=true,ScrollBars=ScrollBars.Vertical,Dock=DockStyle.Fill,MaxLength=20000,Text=(value??"").Replace("\r\n","\n").Replace("\n",Environment.NewLine),BorderStyle=BorderStyle.None,Margin=Padding.Empty};content.Controls.Add(input,0,2);return input;}
  void ShowWindow(){ Show();WindowState=FormWindowState.Normal;Activate(); }
  void CaptureTranslations(Control parent) {
   foreach(Control c in parent.Controls) {
@@ -116,7 +110,7 @@ public partial class MainWindow : Form {
  void CancelConnection(){login.Cancel();cancelLogin.Enabled=false;Log(L.T("Отмена подключения… Поля Client ID станут доступны после отмены."));}
  internal void VerifyControls(Action<bool,string> check) {
   try {
-   VerifyDashboard(check);VerifyQueueActions(check);VerifyCustomSoundControls(check);VerifyJournal(check);RefreshView();check(status.Text.Contains(L.T("нажмите «Запустить»")),"stopped reception status");
+   VerifyDashboard(check);VerifyModernSections(check);VerifyQueueActions(check);VerifyCustomSoundControls(check);VerifyJournal(check);RefreshView();check(status.Text.Contains(L.T("нажмите «Запустить»")),"stopped reception status");
    running=new CancellationTokenSource();e.Reception(true,L.T("Приём заказов активен · Twitch подключён"));
    check(status.Text.Contains(L.T("Приём заказов активен")),"live reception status");
    running.Dispose();running=null;check(Icon!=null,"embedded icon");

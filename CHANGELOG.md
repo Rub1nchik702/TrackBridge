@@ -1,5 +1,14 @@
 # Изменения
 
+## 1.11.0 — 7 November 2026
+
+- Moved moderation into its own sidebar section with separate track and artist columns.
+- Applied dark scrollbars to the queue, log and moderation lists.
+- Added short page transitions that respect the Windows animation preference.
+- Fixed checkbox background rendering that could show overlapping text.
+- Aligned voting and sound settings into dedicated rows.
+- Unified dark dropdowns and chevron buttons for numeric settings.
+
 ## 1.10.0 — 7 November 2026
 
 - Custom notification import from MP3 and other Windows-supported audio formats, with local conversion of the first five seconds to WAV, a built-in fallback and a reset button.

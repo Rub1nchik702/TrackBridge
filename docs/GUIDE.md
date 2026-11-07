@@ -6,7 +6,7 @@
 
 <img src="../assets/TrackBridge-icon.png" width="96" alt="TrackBridge icon">
 
-**By Rub1nchik · Windows · 1.10.0**
+**By Rub1nchik · Windows · 1.11.0**
 
 TrackBridge connects a custom Twitch Channel Points reward to your Spotify queue. Viewers submit a song link, the app finds a matching Spotify track and adds it to the end of your queue without interrupting the current song.
 
@@ -16,19 +16,23 @@ TrackBridge only controls the queue and playback in your own Spotify player; it 
 
 ## Screenshots
 
-TrackBridge **1.10.0**, shown with demonstration data.
+TrackBridge **1.11.0**, shown with demonstration data.
 
 ### Overview
 
-![Overview](../assets/interface-overview-1.10.0-en.png)
+![Overview](../assets/interface-overview-1.11.0-en.png)
 
 ### Queue and history cleanup
 
-![Queue and history cleanup](../assets/interface-queue-1.10.0-en.png)
+![Queue and history cleanup](../assets/interface-queue-1.11.0-en.png)
+
+### Moderation
+
+![Moderation](../assets/interface-moderation-1.11.0-en.png)
 
 ### About and GitHub
 
-![About and GitHub](../assets/interface-about-1.10.0-en.png)
+![About and GitHub](../assets/interface-about-1.11.0-en.png)
 
 ## Custom notification sound
 
@@ -36,7 +40,7 @@ In Settings, choose **Choose audio…** to import an MP3 or another format suppo
 
 The converted copy is stored in `data`, so moving the original file does not break your sound. Volume applies to both custom and built-in sounds. Use **Default sound** to restore the original chime. If a saved sound becomes unavailable, the built-in chime is used.
 
-![Custom sound controls](../assets/interface-settings-1.10.0-en.png)
+![Custom sound controls](../assets/interface-settings-1.11.0-en.png)
 
 ## Sound notifications
 
@@ -170,7 +174,7 @@ The live panel shows the current track, Twitch viewer count and vote progress. C
 
 Use Skip track or Reset votes while requests are running. Voting enabled can disable viewer votes while keeping song commands. Resetting votes does not unlock a skip with an uncertain Spotify response.
 
-While stopped, open Request moderation to set a duration limit (10 minutes by default; 0 disables it), block Explicit tracks, and edit blocked track/artist lists. Use one entry per line. Matching is exact and case insensitive. Tracks accept Spotify links or exact titles; title bans apply to all artists. Artist entries use the exact Spotify name. Explicit relies on Spotify metadata and cannot guarantee filtering every unwanted lyric.
+While stopped, open the **Moderation** sidebar section to set a duration limit (10 minutes by default; 0 disables it), block Explicit tracks, and edit blocked track/artist lists. Use one entry per line. Matching is exact and case insensitive. Tracks accept Spotify links or exact titles; title bans apply to all artists. Artist entries use the exact Spotify name. Explicit relies on Spotify metadata and cannot guarantee filtering every unwanted lyric.
 
 Rules apply before queueing pending and new requests, including direct Spotify links. Tracks already queued are not removed. Rejected orders refund points; unavailable metadata is handled as a temporary failure.
 

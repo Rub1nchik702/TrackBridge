@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.IO.Compression;
 using System.Net.Http;
@@ -13,7 +13,7 @@ using System.Windows.Forms;
 
 namespace TrackBridge {
 static class Updates {
- public const string Current="1.10.0";
+ public const string Current="1.11.0";
  public const string Repository="https://github.com/Rub1nchik702/TrackBridge";
  static readonly string[] Files={"TrackBridge.exe","README.md","README.html","LICENSE.txt","THIRD-PARTY-NOTICES.txt","CHANGELOG.md"};
  internal static Func<HttpMessageHandler> TestHandler; internal static string TestInstalledVersion;
@@ -150,4 +150,3 @@ static class Updates {
  }
 }
 }
-

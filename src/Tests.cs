@@ -23,6 +23,8 @@ static class Tests {
  static void TestLoginControls() {
   string dir=Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"diagnostics","ui-"+Guid.NewGuid().ToString("N"));
   using(var e=new Engine(dir))using(var form=new MainWindow(e,true)) form.VerifyControls(Check);
+  using(var reopened=new Engine(dir))Check(reopened.S.maxTrackMinutes==17 && reopened.S.blockExplicit && reopened.S.blockedTracks.Contains("Track B") && reopened.S.blockedArtists.Contains("Artist B"),"moderation settings survive application restart");
+  using(var host=new Form()){host.Size=new System.Drawing.Size(320,240);host.Show();using(var transition=new PageTransition(new System.Drawing.Bitmap(300,200),new System.Drawing.Bitmap(300,200))){host.Controls.Add(transition);transition.Start();var elapsed=System.Diagnostics.Stopwatch.StartNew();while(!transition.IsDisposed && elapsed.ElapsedMilliseconds<1000){Application.DoEvents();Thread.Sleep(5);}Check(transition.IsDisposed,"page transition completes and releases its overlay");}host.Close();}
  }
  static Dictionary<string,object> Event(string id,string input) {
   return new Dictionary<string,object>{{"id",id},{"reward",new Dictionary<string,object>{{"id","r"}}},{"user_name","viewer"},{"user_input",input}};

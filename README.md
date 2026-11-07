@@ -2,7 +2,7 @@
 
 # TrackBridge
 
-**Windows · 1.10.0 · by Rub1nchik**
+**Windows · 1.11.0 · by Rub1nchik**
 
 **English** · [Русский](README.ru.md)
 
@@ -10,7 +10,7 @@ Twitch Channel Points song requests → your Spotify queue. Viewers submit a lin
 
 **[Download](https://github.com/Rub1nchik702/TrackBridge/releases/latest)** · **[Setup with screenshots](https://github.com/Rub1nchik702/TrackBridge/blob/main/docs/GUIDE.md#setup)** · [Report a problem](https://github.com/Rub1nchik702/TrackBridge/issues/new/choose)
 
-![TrackBridge overview](assets/interface-overview-1.10.0-en.png)
+![TrackBridge overview](assets/interface-overview-1.11.0-en.png)
 
 ## Features
 
@@ -19,6 +19,7 @@ Twitch Channel Points song requests → your Spotify queue. Viewers submit a lin
 - `!song` / `!nowplaying` for the current track; `!skip` / `!voteskip` for skip voting.
 - Quiet notification sound: adjustable volume, your own audio file, or the built-in chime.
 - Request checkboxes, bulk history hiding, played-history cleanup, RU/EN UI and updates.
+- Moderation in the sidebar, dark scrollbars and short page transitions that follow Windows animation preferences.
 
 ## Get started
 
@@ -38,7 +39,7 @@ Check request rows, then click **Hide selected** to hide them from the list. Thi
 
 Keep the `data` folder when updating manually; it contains your settings and account access. Do not share it. Automatic updates verify the publisher signature and SHA-256.
 
-Already on 1.10.0? Download the refreshed ZIP manually: a replacement with the same version is not offered as a new automatic update.
+Version 1.10.0 can update to 1.11.0 through the built-in updater.
 
 ## Source, rights and support
 
