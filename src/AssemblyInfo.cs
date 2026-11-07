@@ -6,3 +6,4 @@ using System.Reflection;
 [assembly: AssemblyCopyright("Copyright © 2026 Rub1nchik. All rights reserved.")]
 [assembly: AssemblyVersion("1.10.0.0")]
 [assembly: AssemblyFileVersion("1.10.0.0")]
+

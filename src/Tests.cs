@@ -28,7 +28,7 @@ static class Tests {
   return new Dictionary<string,object>{{"id",id},{"reward",new Dictionary<string,object>{{"id","r"}}},{"user_name","viewer"},{"user_input",input}};
  }
  static async Task RunAsync() {
-  await TestCommands();await TestModeration();TestCleanup();TestLimits();
+  await TestCommands();await TestModeration();TestCleanup();TestLimits();await TestSoundNotifications();TestCustomSound();
   var request=Engine.Obj(Engine.Json(new {broadcaster_id="test",sender_id="test",message="check"}));
   Check(Engine.Str(request,"broadcaster_id")=="test" && Engine.Str(request,"message")=="check","anonymous API body keeps wire names");
   var settingsRoundTrip=new System.Web.Script.Serialization.JavaScriptSerializer().Deserialize<Settings>(Engine.Json(new Settings()));
@@ -142,7 +142,7 @@ static class Tests {
   bool rejected=false;try{Updates.Extract(archive,Path.Combine(dir,"bad-hash"),new string('0',64));}catch(IOException){rejected=true;}Check(rejected,"reject corrupt package hash");
   byte[] unsafeZip=UpdateZip(true);string unsafeArchive=Path.Combine(dir,"unsafe.zip");File.WriteAllBytes(unsafeArchive,unsafeZip);
   rejected=false;try{Updates.Extract(unsafeArchive,Path.Combine(dir,"bad-path"),Updates.Hash(unsafeZip));}catch(IOException){rejected=true;}Check(rejected,"reject zip traversal and unexpected settings entry");
-  string tag="v1.9.0-beta.2",asset="TrackBridge-1.9.0-beta.2-win.zip";
+  string tag="v"+Updates.Current,asset="TrackBridge-"+Updates.Current+"-win.zip";
   byte[] manifestBytes=System.Text.Encoding.UTF8.GetBytes(Engine.Json(new {version=tag.Substring(1),archive=asset,sha256=Updates.Hash(bytes)})),signatureBytes;
   string keyPath=Environment.GetEnvironmentVariable("TRACKBRIDGE_TEST_SIGNING_KEY");if(string.IsNullOrEmpty(keyPath))throw new Exception("Signed updater checks require the private build environment.");
   using(var rsa=new RSACryptoServiceProvider()){rsa.PersistKeyInCsp=false;rsa.FromXmlString(System.Text.Encoding.UTF8.GetString(ProtectedData.Unprotect(File.ReadAllBytes(keyPath),null,DataProtectionScope.CurrentUser)));signatureBytes=System.Text.Encoding.ASCII.GetBytes(Convert.ToBase64String(rsa.SignData(manifestBytes,CryptoConfig.MapNameToOID("SHA256"))));}
@@ -150,21 +150,21 @@ static class Tests {
   bool tampered=false;try{Updates.SignedManifest(System.Text.Encoding.UTF8.GetBytes("{}"),System.Text.Encoding.ASCII.GetString(signatureBytes));}catch(CryptographicException){tampered=true;}catch(IOException){tampered=true;}Check(tampered,"tampered signature rejected");
   var downloadAssets=new[]{new {name=asset,state="uploaded",browser_download_url=Updates.Repository+"/releases/download/"+tag+"/"+asset,digest="sha256:"+Updates.Hash(bytes)},new {name="TrackBridge-update.json",state="uploaded",browser_download_url=Updates.Repository+"/releases/download/"+tag+"/TrackBridge-update.json",digest=""},new {name="TrackBridge-update.sig",state="uploaded",browser_download_url=Updates.Repository+"/releases/download/"+tag+"/TrackBridge-update.sig",digest=""}};
   string json=Engine.Json(new[]{new {tag_name=tag,draft=false,assets=downloadAssets}});
-  Updates.TestHandler=()=>new UpdateHttp(json,bytes,manifestBytes,signatureBytes);
+  Updates.TestHandler=()=>new UpdateHttp(json,bytes,manifestBytes,signatureBytes);Updates.TestInstalledVersion="0.0.0";
   try {
    string stage=await Updates.Prepare(dir,s=>{},CancellationToken.None);
    Check(stage!=null && File.Exists(Path.Combine(stage,"payload","TrackBridge.exe")),"automatic GitHub check downloads and validates package");
-   string settings=Path.Combine(dir,"data");Directory.CreateDirectory(settings);File.WriteAllText(Path.Combine(settings,"settings.bin"),"private-token-fixture");
+   string settings=Path.Combine(dir,"data");Directory.CreateDirectory(settings);byte[] soundFixture=NotificationSound.WaveForPlayback(20,null);File.WriteAllBytes(Path.Combine(settings,"request-notification.wav"),soundFixture);File.WriteAllText(Path.Combine(settings,"settings.bin"),"private-token-fixture");
    string exe=Path.Combine(dir,"TrackBridge.exe");File.WriteAllText(exe,"old-exe");File.WriteAllText(Path.Combine(dir,"README.md"),"old-readme");
    Updates.ApplyFiles(stage,exe);
    Check(File.ReadAllBytes(exe).SequenceEqual(File.ReadAllBytes(Application.ExecutablePath)),"verified executable installed");
-   Check(File.ReadAllText(Path.Combine(settings,"settings.bin"))=="private-token-fixture","update preserves account data");
+   Check(File.ReadAllText(Path.Combine(settings,"settings.bin"))=="private-token-fixture","update preserves account data");Check(File.ReadAllBytes(Path.Combine(settings,"request-notification.wav")).SequenceEqual(soundFixture),"update preserves custom sound file");
    Check(File.ReadAllText(Path.Combine(dir,"README.md"))=="new-README.md","update installs packaged documents");
    string rollback=await Updates.Prepare(dir,s=>{},CancellationToken.None);File.WriteAllText(exe,"previous-exe");File.WriteAllText(Path.Combine(dir,"README.md"),"previous-readme");
    bool failed=false;try{Updates.ApplyFiles(rollback,exe,name=>{if(name=="README.html")throw new IOException("Simulated disk failure");});}catch(IOException){failed=true;}
    Check(failed && File.ReadAllText(exe)=="previous-exe" && File.ReadAllText(Path.Combine(dir,"README.md"))=="previous-readme","installation failure rolls back changed files");
-   Check(File.ReadAllText(Path.Combine(settings,"settings.bin"))=="private-token-fixture","rollback preserves account data");
-  } finally{Updates.TestHandler=null;}
+   Check(File.ReadAllText(Path.Combine(settings,"settings.bin"))=="private-token-fixture","rollback preserves account data");Check(File.ReadAllBytes(Path.Combine(settings,"request-notification.wav")).SequenceEqual(soundFixture),"rollback preserves custom sound file");
+  } finally{Updates.TestHandler=null;Updates.TestInstalledVersion=null;}
  }
  static Dictionary<string,object> SearchResult(params Dictionary<string,object>[] tracks) {
   return new Dictionary<string,object>{{"tracks",new Dictionary<string,object>{{"items",tracks}}}};
@@ -221,15 +221,80 @@ static class Tests {
   }
   using(var e=new Engine(dir))Check(e.S.maxTrackMinutes==10 && e.S.votingEnabled,"moderation and voting settings persist");
  }
+ static async Task TestSoundNotifications(){
+  string dir=Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"diagnostics","sound-"+Guid.NewGuid().ToString("N"));
+  using(var e=new Engine(dir)){
+   e.S.maxTrackMinutes=0;e.S.reward="r";e.S.broadcaster="b";e.S.spotify.access_token="fixture";e.S.spotify.expires=Engine.Now+3600;
+   int signals=0,queueCalls=0;var reached=new TaskCompletionSource<bool>();var response=new TaskCompletionSource<bool>();
+   e.TrackQueued=()=>signals++;
+   e.TestApi=async(sp,method,endpoint,body)=>{if(sp && method=="POST"){queueCalls++;reached.TrySetResult(true);await response.Task;}return new Dictionary<string,object>();};
+   e.Accept(Event("sound-success","spotify:track:4uLU6hMCjMI75M1A2tKUQC"));var request=e.S.orders.Last();var processing=e.ProcessOrder(request);
+   await reached.Task;Check(signals==0,"no sound before Spotify responds");response.SetResult(true);await processing;
+   Check(signals==1 && request.status=="done" && queueCalls==1,"one sound after successful viewer queue request");await e.ProcessOrder(request);Check(signals==1,"no sound for repeated completed request");
+   foreach(int status in new[]{400,401,403,404,429,500}){
+    e.TestApi=(sp,method,endpoint,body)=>{if(sp)throw new ApiError(status,0,"fixture");return Task.FromResult(new Dictionary<string,object>());};
+    var failed=new Order{id="failure-"+status,broadcaster="b",reward="r",input="fixture",uri=request.uri,status="pending"};e.S.orders.Add(failed);
+    // Avoid the production retry delay while preserving the rejected response branch.
+    using(var cancel=new CancellationTokenSource()){cancel.Cancel();try{await e.ProcessOrder(failed,cancel.Token);}catch(OperationCanceledException){}}
+    Check(signals==1,"no sound for Spotify HTTP "+status);
+   }
+   e.TestApi=(sp,method,endpoint,body)=>{if(sp)throw new IOException("simulated lost response");return Task.FromResult(new Dictionary<string,object>());};
+   var uncertain=new Order{id="sound-uncertain",broadcaster="b",reward="r",uri=request.uri,status="pending"};e.S.orders.Add(uncertain);await e.ProcessOrder(uncertain);Check(signals==1 && uncertain.status=="uncertain","no sound on ambiguous queue response");
+   e.TestApi=(sp,method,endpoint,body)=>Task.FromResult(new Dictionary<string,object>());
+   var resumed=new Order{id="resumed",broadcaster="b",reward="r",uri=request.uri,status="queued"};e.S.orders.Add(resumed);await e.ProcessOrder(resumed);Check(signals==1 && resumed.status=="done","no sound when resuming Twitch fulfillment");
+   e.TrackQueued=()=>{throw new InvalidOperationException("audio device fixture");};var silentFailure=new Order{id="sound-callback-failure",broadcaster="b",reward="r",uri=request.uri,status="pending"};e.S.orders.Add(silentFailure);await e.ProcessOrder(silentFailure);Check(silentFailure.status=="done","sound failure cannot turn accepted request into uncertain");
+   e.S.requestSoundEnabled=false;e.S.requestSoundVolume=9;e.Save();
+  }
+  using(var e=new Engine(dir))Check(!e.S.requestSoundEnabled && e.S.requestSoundVolume==9,"sound preference and volume survive restart");
+  var oldSettings=new System.Web.Script.Serialization.JavaScriptSerializer().Deserialize<Settings>("{\"language\":\"en\"}");Check(oldSettings.requestSoundEnabled && oldSettings.requestSoundVolume==20,"legacy settings receive quiet sound defaults");
+  var wave=(byte[])typeof(NotificationSound).GetMethod("CreateWave",BindingFlags.Static|BindingFlags.NonPublic).Invoke(null,new object[]{20});
+  Check(System.Text.Encoding.ASCII.GetString(wave,0,4)=="RIFF" && BitConverter.ToInt32(wave,4)==wave.Length-8 && BitConverter.ToInt32(wave,24)==22050,"notification has valid PCM WAV header");
+  int peak=0;for(int i=44;i<wave.Length;i+=2)peak=Math.Max(peak,Math.Abs((int)BitConverter.ToInt16(wave,i)));Check(peak>0 && peak<5000 && (wave.Length-44)/44100.0<.5,"default signal is short and has low amplitude");
+ }
+ static int WavePeak(byte[] wave){int peak=0;for(int i=44;i<wave.Length;i+=2)peak=Math.Max(peak,Math.Abs((int)BitConverter.ToInt16(wave,i)));return peak;}
+ static void TestCustomSound(){
+  string dir=Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"diagnostics","custom-sound-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(dir);
+  byte[] standard=NotificationSound.WaveForPlayback(20,null);string original=Path.Combine(dir,"My notification.wav");File.WriteAllBytes(original,standard);string stored;
+  using(var e=new Engine(Path.Combine(dir,"data"))){
+   Check(e.RequestSoundFile==null && e.S.requestSoundName=="","default sound selected for new settings");e.SetRequestSound(original);stored=e.RequestSoundFile;
+   Check(stored!=original && File.Exists(stored) && e.S.requestSoundName==Path.GetFileName(original),"custom sound copied into persistent data with a display filename");
+   Check(NotificationSound.ImportWave(stored).SequenceEqual(standard),"import retains valid PCM samples");File.Delete(original);
+   Check(NotificationSound.WaveForPlayback(20,stored).Length==standard.Length,"custom sound remains playable after original file removed");
+   Check(WavePeak(NotificationSound.WaveForPlayback(10,stored))<WavePeak(NotificationSound.WaveForPlayback(20,stored)) && WavePeak(NotificationSound.WaveForPlayback(40,stored))<8000,"custom sound volume applies with bounded peak");
+   Check(WavePeak(NotificationSound.WaveForPlayback(0,stored))==0,"zero volume mutes custom WAV");
+   byte[] broken=(byte[])standard.Clone();broken[0]=0;string invalid=Path.Combine(dir,"broken.wav");File.WriteAllBytes(invalid,broken);bool rejected=false;try{e.SetRequestSound(invalid);}catch(IOException){rejected=true;}
+   Check(rejected && e.RequestSoundFile==stored && File.ReadAllBytes(stored).SequenceEqual(standard),"failed import leaves chosen sound and its saved bytes unchanged");
+  }
+  using(var e=new Engine(Path.Combine(dir,"data"))){
+   Check(e.RequestSoundFile==stored && e.S.requestSoundName=="My notification.wav","custom selection persists after restart");File.WriteAllBytes(stored,new byte[]{1,2,3});
+   Check(NotificationSound.WaveForPlayback(20,stored).SequenceEqual(standard),"corrupt saved sound falls back to the default");File.Delete(stored);
+   Check(NotificationSound.WaveForPlayback(20,stored).SequenceEqual(standard),"missing saved sound falls back to the default");e.ResetRequestSound();Check(e.RequestSoundFile==null,"reset selects the standard signal");
+  }
+  using(var e=new Engine(Path.Combine(dir,"data")))Check(e.RequestSoundFile==null,"standard selection persists after restart");
+  for(int mode=0;mode<7;mode++){
+   byte[] invalid=(byte[])standard.Clone();
+   if(mode==0)invalid=invalid.Take(invalid.Length-2).ToArray();
+   if(mode==1)invalid[20]=3;
+   if(mode==2)invalid[22]=3;
+   if(mode==3)Array.Copy(BitConverter.GetBytes(0),0,invalid,24,4);
+   if(mode==4)Array.Copy(BitConverter.GetBytes(uint.MaxValue),0,invalid,40,4);
+   if(mode==5){invalid=new byte[44+22050*2*6];Array.Copy(standard,invalid,44);Array.Copy(BitConverter.GetBytes(invalid.Length-8),0,invalid,4,4);Array.Copy(BitConverter.GetBytes(invalid.Length-44),0,invalid,40,4);}
+   if(mode==6)invalid=new byte[2*1024*1024+1];
+   string bad=Path.Combine(dir,"invalid-"+mode+".wav");File.WriteAllBytes(bad,invalid);bool rejected=false;try{NotificationSound.ImportWave(bad);}catch(IOException){rejected=true;}Check(rejected,"invalid custom WAV rejected: "+mode);
+  }
+  byte[] stereo=(byte[])standard.Clone();Array.Copy(BitConverter.GetBytes((short)2),0,stereo,22,2);Array.Copy(BitConverter.GetBytes(22050*4),0,stereo,28,4);Array.Copy(BitConverter.GetBytes((short)4),0,stereo,32,2);string stereoFile=Path.Combine(dir,"stereo.wav");File.WriteAllBytes(stereoFile,stereo);Check(NotificationSound.ImportWave(stereoFile).SequenceEqual(stereo),"stereo PCM sound supported");
+  byte[] withMetadata;using(var metadata=new MemoryStream())using(var writer=new BinaryWriter(metadata)){writer.Write(standard,0,36);writer.Write(System.Text.Encoding.ASCII.GetBytes("JUNK"));writer.Write(4);writer.Write(new byte[]{1,2,3,4});writer.Write(standard,36,standard.Length-36);withMetadata=metadata.ToArray();}Array.Copy(BitConverter.GetBytes(withMetadata.Length-8),0,withMetadata,4,4);string metadataFile=Path.Combine(dir,"metadata.wav");File.WriteAllBytes(metadataFile,withMetadata);Check(NotificationSound.ImportWave(metadataFile).SequenceEqual(standard),"import strips non-audio metadata chunks");
+  byte[] silence=(byte[])standard.Clone();Array.Clear(silence,44,silence.Length-44);string silent=Path.Combine(dir,"silence.wav");File.WriteAllBytes(silent,silence);Check(WavePeak(NotificationSound.WaveForPlayback(40,silent))==0,"silent file does not cause gain errors");
+ }
  static void TestCleanup(){
   string dir=Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"diagnostics","cleanup-"+Guid.NewGuid().ToString("N"));
   using(var e=new Engine(dir)){
    var first=new Order{id="first",uri="spotify:track:4uLU6hMCjMI75M1A2tKUQC",status="done"};
    var second=new Order{id="second",uri="spotify:track:1234567890123456789012",status="done"};
    var pending=new Order{id="pending",uri=second.uri,status="pending"};e.S.orders.AddRange(new[]{first,second,pending});e.S.recentReceipts.Add("b:first");
-   Check(e.HidePlayedOrders()==0,"queue acceptance alone is not playback");e.ObserveOrderedPlayback(first.uri,true);Check(!e.CanHideOrder(first),"currently playing request protected");e.ObserveOrderedPlayback("",false);Check(!first.played,"missing playback response is not completion");e.ObserveOrderedPlayback(second.uri,true);
+   Check(e.HidePlayedOrders()==0,"queue acceptance alone is not playback");e.ObserveOrderedPlayback(first.uri,true);Check(!e.CanHideOrder(first),"currently playing request protected");e.ObserveOrderedPlayback("",false);Check(!first.played,"missing playback response is not completion");e.ObserveOrderedPlayback(first.uri,true,true);Check(!e.CanHideOrder(first),"repeated current URI remains protected after a playback reset");e.ObserveOrderedPlayback(second.uri,true);
    Check(first.played && !second.played,"observed track transition marks only previous request");Check(e.HidePlayedOrders()==1 && first.historyHidden && !second.historyHidden && !pending.historyHidden,"cleanup preserves current and pending requests");Check(e.S.recentReceipts.Contains("b:first"),"cleanup retains deduplication receipts");
-   e.S.autoHidePlayed=true;e.Save();
+   Check(e.HideSelectedOrders(new[]{second.id,pending.id})==2 && second.historyHidden && pending.historyHidden && second.status=="done" && pending.status=="pending","manual hide handles current and pending rows without changing backend state");Check(e.HideSelectedOrders(new[]{second.id,pending.id})==0,"manual hide is idempotent");e.S.autoHidePlayed=true;e.Save();
   }
   using(var e=new Engine(dir))Check(e.S.autoHidePlayed && e.S.orders[0].historyHidden,"cleanup preference and hidden history persist");
   Check(Updates.Compare("1.9.0.1-beta.1","1.9.0-beta.1")>0,"four-part interface versions order correctly");Check(Updates.Compare("2.0.0","2.0.0-beta.99")>0,"2.0 stable newer than beta");
@@ -297,3 +362,4 @@ static class Tests {
  }
 }
 }
+

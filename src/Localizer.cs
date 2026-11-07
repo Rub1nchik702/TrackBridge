@@ -8,6 +8,19 @@ static class L {
  public static string Canonical(string value) {var pair=English.FirstOrDefault(p=>p.Value==value);return pair.Key??value;}
  public static string Runtime(string value) {return T(Canonical(value));}
  public static readonly Dictionary<string,string> English=new Dictionary<string,string> {
+{"Выбрать WAV…","Choose WAV…"},
+{"Стандартный сигнал","Default sound"},
+{"Свой сигнал: ","Custom sound: "},
+{"Выберите звук уведомления","Choose notification sound"},
+{"Не удалось выбрать сигнал: ","Could not select sound: "},
+{"Выберите WAV-файл размером до 2 МБ.","Choose a WAV file no larger than 2 MB."},
+{"Нужен WAV PCM 16 бит, моно или стерео, длительностью до 5 секунд.","Use a 16-bit PCM WAV file, mono or stereo, up to 5 seconds long."},
+{"Повреждённый WAV-файл.","The WAV file is damaged."},
+{"Неподдерживаемый формат WAV-файла.","Unsupported WAV format."},
+{"Скрыть выбранные","Hide selected"},
+{"Отметьте треки флажками или выделите строки.","Check tracks or select rows first."},
+{"Нет сыгранных записей: приложение должно наблюдать воспроизведение и смену трека.","No played entries: the app must observe playback and a track change."},
+{"Скрыто записей: ","Entries hidden: "},
 {"Звук при добавлении зрительского трека","Sound when a viewer's track is added"},
 {"Громкость сигнала (%):","Signal volume (%):"},
 {"Прослушать сигнал","Preview sound"},
@@ -159,3 +172,4 @@ static class L {
  };
 }
 }
+

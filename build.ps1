@@ -26,3 +26,4 @@ $exeHash = (Get-FileHash -LiteralPath (Join-Path $stage 'TrackBridge.exe') -Algo
 [IO.File]::WriteAllText((Join-Path $OutputDirectory 'TrackBridge-SHA256SUMS.txt'),"$zipHash  $archiveName`n$exeHash  TrackBridge.exe`n")
 [IO.File]::WriteAllText((Join-Path $OutputDirectory 'TrackBridge-update.json'),([ordered]@{version=$version;archive=$archiveName;sha256=$zipHash} | ConvertTo-Json -Compress))
 Write-Output ('Build: ' + $archive)
+

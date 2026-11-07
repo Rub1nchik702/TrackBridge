@@ -27,6 +27,7 @@ public class Settings {
  public bool autoHidePlayed;
  public bool requestSoundEnabled=true;
  public int requestSoundVolume=20;
+ public string requestSoundName="";
  public bool chatAllowed;
  public bool chatReadAllowed;
  public bool skipAutomatic=true;
@@ -59,9 +60,9 @@ public partial class Engine : IDisposable {
  public readonly object Gate = new object();
  readonly SemaphoreSlim auth = new SemaphoreSlim(1,1);
  readonly HttpClient http = new HttpClient(new HttpClientHandler { AllowAutoRedirect=false }) { Timeout=TimeSpan.FromSeconds(20) };
- string observedOrder="",observedUri="";
+ string observedOrder="",observedUri="",currentPlaybackUri="";
  public void ObserveOrderedPlayback(string uri,bool playing,bool restarted=false){
-  if(string.IsNullOrEmpty(uri))return;
+  if(string.IsNullOrEmpty(uri))return;currentPlaybackUri=uri;
   lock(Gate){
    bool changed=false;
    if(observedOrder!="" && (observedUri!=uri || restarted)){
@@ -73,9 +74,17 @@ public partial class Engine : IDisposable {
    if(changed)Save();
   }
  }
- public bool CanHideOrder(Order order){return order.status=="done" && order.played && order.id!=observedOrder;}
+ public bool CanHideOrder(Order order){return order.status=="done" && order.played && order.id!=observedOrder && order.uri!=currentPlaybackUri;}
  public int HidePlayedOrders(string id=null){lock(Gate){int count=0;foreach(var order in S.orders.Where(o=>!o.historyHidden && CanHideOrder(o) && (id==null || o.id==id))){order.historyHidden=true;count++;}if(count>0)Save();return count;}}
+ public int HideSelectedOrders(IEnumerable<string> ids){lock(Gate){var selected=new HashSet<string>(ids);int count=0;foreach(var order in S.orders.Where(o=>!o.historyHidden && selected.Contains(o.id))){order.historyHidden=true;count++;}if(count>0)Save();return count;}}
  readonly string path;
+ public string RequestSoundFile {get{return string.IsNullOrEmpty(S.requestSoundName)?null:Path.Combine(Path.GetDirectoryName(path),"request-notification.wav");}}
+ public void SetRequestSound(string selectedFile){
+  byte[] wave=NotificationSound.ImportWave(selectedFile);string destination=Path.Combine(Path.GetDirectoryName(path),"request-notification.wav");
+  File.WriteAllBytes(destination+".tmp",wave);if(File.Exists(destination))File.Replace(destination+".tmp",destination,null);else File.Move(destination+".tmp",destination);
+  S.requestSoundName=Path.GetFileName(selectedFile);Save();
+ }
+ public void ResetRequestSound(){S.requestSoundName="";Save();}
  public static long Now { get { return DateTimeOffset.UtcNow.ToUnixTimeSeconds(); } }
  public static Dictionary<string,object> Obj(string s) { return new JavaScriptSerializer().Deserialize<Dictionary<string,object>>(s); }
  public static string Json(object o) { return Serializer().Serialize(o); }
@@ -327,3 +336,4 @@ public partial class Engine : IDisposable {
  public void Dispose() { http.Dispose(); auth.Dispose(); }
 }
 }
+

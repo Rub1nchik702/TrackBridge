@@ -16,7 +16,7 @@ static class Updates {
  public const string Current="1.10.0";
  public const string Repository="https://github.com/Rub1nchik702/TrackBridge";
  static readonly string[] Files={"TrackBridge.exe","README.md","README.html","LICENSE.txt","THIRD-PARTY-NOTICES.txt","CHANGELOG.md"};
- internal static Func<HttpMessageHandler> TestHandler;
+ internal static Func<HttpMessageHandler> TestHandler; internal static string TestInstalledVersion;
  public static int Compare(string a,string b) {
   var pattern=@"^v?(\d+)\.(\d+)\.(\d+)(?:\.(\d+))?(?:-beta\.(\d+))?$";
   var x=Regex.Match(a??"",pattern);var y=Regex.Match(b??"",pattern);
@@ -76,7 +76,7 @@ static class Updates {
   using(var client=Client()) {
    string json;
    using(var response=await client.GetAsync("https://api.github.com/repos/Rub1nchik702/TrackBridge/releases?per_page=30",ct)) {response.EnsureSuccessStatusCode();json=await response.Content.ReadAsStringAsync();}
-   var release=SelectRelease(json,Current);if(release==null)return null;
+   var release=SelectRelease(json,TestInstalledVersion??Current);if(release==null)return null;
    string tag=Engine.Str(release,"tag_name"),name="TrackBridge-"+tag.Substring(1)+"-win.zip";
    var assets=((System.Collections.IEnumerable)release["assets"]).Cast<Dictionary<string,object>>();
    var asset=assets.FirstOrDefault(a=>Engine.Str(a,"name")==name && Engine.Str(a,"state")=="uploaded");
@@ -111,7 +111,7 @@ static class Updates {
   if(!string.Equals(Path.GetDirectoryName(Path.GetFullPath(stage)),Path.Combine(folder,".updates"),StringComparison.OrdinalIgnoreCase))throw new IOException(L.T("Некорректная папка обновления."));
   NoLink(folder);NoLink(Path.Combine(folder,".updates"));NoLink(stage);
   var signed=SignedManifest(File.ReadAllBytes(Path.Combine(stage,"manifest.json")),File.ReadAllText(Path.Combine(stage,"manifest.sig")));
-  if(Compare(Engine.Str(signed,"version"),Current)<=0)throw new IOException("Update is not newer than this installed version.");
+  if(Compare(Engine.Str(signed,"version"),TestInstalledVersion??Current)<=0)throw new IOException("Update is not newer than this installed version.");
   string payload=Path.Combine(stage,"payload");Extract(Path.Combine(stage,"update.zip"),payload,Engine.Str(signed,"sha256"));
   string backup=Path.Combine(stage,"backup");NoLink(backup);Directory.CreateDirectory(backup);
   var changed=new List<string>();
@@ -150,3 +150,4 @@ static class Updates {
  }
 }
 }
+

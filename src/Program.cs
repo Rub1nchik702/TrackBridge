@@ -22,6 +22,9 @@ public partial class MainWindow : Form {
  readonly System.Windows.Forms.Timer logTimer=new System.Windows.Forms.Timer();
  readonly CheckBox autoScrollLog=new CheckBox();
  ListView orders=new ListView();
+ readonly HashSet<string> checkedOrderIds=new HashSet<string>();
+ bool refreshingOrders;
+ Label requestSoundFileLabel;
  Label status=new Label(),accounts=new Label();
  Button start=new SoftButton(),stop=new SoftButton(),cancelLogin=new SoftButton();
  List<Control> locked=new List<Control>();
@@ -47,7 +50,7 @@ public partial class MainWindow : Form {
   BuildDashboard();
   locked.Add(twitch);locked.Add(spotify);
   e.Log=Log;e.Changed=RefreshView;
-  e.TrackQueued=()=>{if(!previewMode && !exiting && e.S.requestSoundEnabled)NotificationSound.Play(e.S.requestSoundVolume);};
+  e.TrackQueued=()=>{if(!previewMode && !exiting && e.S.requestSoundEnabled)NotificationSound.Play(e.S.requestSoundVolume,e.RequestSoundFile);};
   twitch.Text=e.S.twitchId;spotify.Text=e.S.spotifyId;
   tray=new NotifyIcon {Icon=Icon,Text="TrackBridge",Visible=true};tray.DoubleClick+=(s,a)=>ShowWindow();
   var trayMenu=new ContextMenuStrip();trayMenu.Items.Add(L.T("Открыть"),null,(s,a)=>ShowWindow());trayMenu.Items.Add(L.T("Выход"),null,(s,a)=>Close());tray.ContextMenuStrip=trayMenu;
@@ -112,7 +115,7 @@ public partial class MainWindow : Form {
  void CancelConnection(){login.Cancel();cancelLogin.Enabled=false;Log(L.T("Отмена подключения… Поля Client ID станут доступны после отмены."));}
  internal void VerifyControls(Action<bool,string> check) {
   try {
-   VerifyDashboard(check);VerifyJournal(check);RefreshView();check(status.Text.Contains(L.T("нажмите «Запустить»")),"stopped reception status");
+   VerifyDashboard(check);VerifyQueueActions(check);VerifyCustomSoundControls(check);VerifyJournal(check);RefreshView();check(status.Text.Contains(L.T("нажмите «Запустить»")),"stopped reception status");
    running=new CancellationTokenSource();e.Reception(true,L.T("Приём заказов активен · Twitch подключён"));
    check(status.Text.Contains(L.T("Приём заказов активен")),"live reception status");
    running.Dispose();running=null;check(Icon!=null,"embedded icon");
@@ -213,19 +216,20 @@ public partial class MainWindow : Form {
  }
  public void RefreshView() {
   if(IsDisposed)return;if(InvokeRequired){BeginInvoke(new Action(RefreshView));return;}
+  if(requestSoundFileLabel!=null)requestSoundFileLabel.Text=string.IsNullOrEmpty(e.S.requestSoundName)?L.T("Стандартный сигнал"):L.T("Свой сигнал: ")+e.S.requestSoundName;
   accounts.Text="Twitch: "+(e.S.twitch.access_token==""?L.T("не подключён"):L.T("подключён"))+"   ·   Spotify: "+(e.S.spotify.access_token==""?L.T("не подключён"):L.T("подключён"));
   status.Text=connecting?L.T("Ожидает авторизации · после подключения нажмите «Запустить»"):running==null?L.T("Приём остановлен — нажмите «Запустить»"):L.Runtime(e.ReceptionStatus);
   status.ForeColor=running!=null && e.EventsConnected?Color.FromArgb(102,226,164):Color.FromArgb(250,193,98);
   playbackPanel.Text=L.T("Сейчас играет: ")+(string.IsNullOrEmpty(e.NowPlaying)?"—":e.NowPlaying);
   votePanel.Text=running==null?L.T("Голосование ожидает запуска"):e.VoteStatus;
-  string selected=orders.SelectedItems.Count>0?((Order)orders.SelectedItems[0].Tag).id:null;
-  orders.BeginUpdate();orders.Items.Clear();
+  var selected=new HashSet<string>(orders.SelectedItems.Cast<ListViewItem>().Select(item=>((Order)item.Tag).id));
+  refreshingOrders=true;orders.BeginUpdate();orders.Items.Clear();
   lock(e.Gate)foreach(var o in e.S.orders.Where(o=>!o.historyHidden && !(e.S.autoHidePlayed && o.played && o.status=="done")).Reverse().Take(300)) {
    string label=o.played && o.status=="done"?L.T("Сыгран / пропущен"):o.status=="done"?L.T("В очереди Spotify"):o.status=="canceled"?L.T("Баллы возвращены"):o.status=="uncertain"?L.T("Проверьте вручную"):o.status=="pending"?L.T("Ожидание"):o.status=="sending"?L.T("Отправка"):o.status=="queued"?L.T("Подтверждение"):o.status=="reject"?L.T("Возврат баллов"):L.T("Проверьте Twitch");
    DateTime orderedAt;string time=DateTime.TryParse(o.time,out orderedAt)?orderedAt.ToString("HH:mm"):o.time;
-   var row=new ListViewItem(new[]{time,o.user,label,(string.IsNullOrEmpty(o.trackTitle)?(o.uri??o.input):o.trackTitle+" — "+o.trackArtist)+" — "+L.Runtime(o.note)}){Tag=o,ToolTipText=(o.uri??o.input)+" — "+L.Runtime(o.note)};orders.Items.Add(row);if(o.id==selected)row.Selected=true;
+   var row=new ListViewItem(new[]{time,o.user,label,(string.IsNullOrEmpty(o.trackTitle)?(o.uri??o.input):o.trackTitle+" — "+o.trackArtist)+" — "+L.Runtime(o.note)}){Tag=o,ToolTipText=(o.uri??o.input)+" — "+L.Runtime(o.note),Checked=checkedOrderIds.Contains(o.id)};orders.Items.Add(row);if(selected.Contains(o.id))row.Selected=true;
   }
-  orders.EndUpdate();RefreshDashboard();
+  orders.EndUpdate();refreshingOrders=false;checkedOrderIds.IntersectWith(orders.Items.Cast<ListViewItem>().Select(row=>((Order)row.Tag).id));RefreshDashboard();
  }
 }
 static class Program {
@@ -255,3 +259,4 @@ static class Program {
  }
 }
 }
+

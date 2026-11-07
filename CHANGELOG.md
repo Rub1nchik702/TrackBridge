@@ -2,6 +2,9 @@
 
 ## 1.10.0 — 7 November 2026
 
+- Custom WAV notification selection with a built-in fallback and a reset button.
+- Added persistent request-row checkboxes and manual bulk hiding without changing Spotify or Twitch processing.
+
 - Added a quiet two-note notification after a viewer's track is successfully added to Spotify.
 - Added sound enable/disable, volume adjustment and a preview button in Settings. Preferences are saved.
 
@@ -111,3 +114,4 @@
 - Обфускация имён типов и методов и скрытие строковых констант с сохранением схемы настроек и полей API.
 - Автор приложения: Rub1nchik; иконка встроена в исполняемый файл.
 - Добавлены инструкция, лицензия готового приложения, описание обработки данных и ограничения beta-версии.
+
