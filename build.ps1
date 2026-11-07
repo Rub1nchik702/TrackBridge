@@ -2,7 +2,7 @@ param([string]$OutputDirectory = (Join-Path $PSScriptRoot 'dist'))
 $ErrorActionPreference = 'Stop'
 $compiler = Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'
 if (!(Test-Path -LiteralPath $compiler)) { throw '.NET Framework C# compiler is required.' }
-$files = @('Core.cs','Localizer.cs','SigningKey.cs','Resolver.cs','Updates.cs','ChatCommands.cs','Listener.cs','Program.cs','Dashboard.cs','Brand.cs','Tests.cs','AssemblyInfo.cs') | ForEach-Object { Join-Path $PSScriptRoot ('src\' + $_) }
+$files = @('Core.cs','Localizer.cs','SigningKey.cs','Resolver.cs','Updates.cs','ChatCommands.cs','Listener.cs','Program.cs','Dashboard.cs','Brand.cs','NotificationSound.cs','Tests.cs','AssemblyInfo.cs') | ForEach-Object { Join-Path $PSScriptRoot ('src\' + $_) }
 $versionText = [IO.File]::ReadAllText((Join-Path $PSScriptRoot 'src\Updates.cs'))
 $version = [regex]::Match($versionText, 'Current\s*=\s*"([0-9.]+(?:-beta\.[0-9]+)?)"').Groups[1].Value
 if (!$version) { throw 'Version is missing.' }

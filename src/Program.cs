@@ -47,6 +47,7 @@ public partial class MainWindow : Form {
   BuildDashboard();
   locked.Add(twitch);locked.Add(spotify);
   e.Log=Log;e.Changed=RefreshView;
+  e.TrackQueued=()=>{if(!previewMode && !exiting && e.S.requestSoundEnabled)NotificationSound.Play(e.S.requestSoundVolume);};
   twitch.Text=e.S.twitchId;spotify.Text=e.S.spotifyId;
   tray=new NotifyIcon {Icon=Icon,Text="TrackBridge",Visible=true};tray.DoubleClick+=(s,a)=>ShowWindow();
   var trayMenu=new ContextMenuStrip();trayMenu.Items.Add(L.T("Открыть"),null,(s,a)=>ShowWindow());trayMenu.Items.Add(L.T("Выход"),null,(s,a)=>Close());tray.ContextMenuStrip=trayMenu;

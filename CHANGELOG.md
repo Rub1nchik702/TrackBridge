@@ -1,5 +1,10 @@
 # Изменения
 
+## 1.10.0 — 7 November 2026
+
+- Added a quiet two-note notification after a viewer's track is successfully added to Spotify.
+- Added sound enable/disable, volume adjustment and a preview button in Settings. Preferences are saved.
+
 ## 1.9.0.2 — 6 November 2026
 
 - Embedded the application icon for the main window, Windows taskbar and system tray.

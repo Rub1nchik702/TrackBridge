@@ -25,6 +25,8 @@ public class Settings {
  public List<string> recentReceipts=new List<string>();
  public string language="ru";
  public bool autoHidePlayed;
+ public bool requestSoundEnabled=true;
+ public int requestSoundVolume=20;
  public bool chatAllowed;
  public bool chatReadAllowed;
  public bool skipAutomatic=true;
@@ -45,6 +47,7 @@ public partial class Engine : IDisposable {
  public Settings S;
  public Action<string> Log = delegate {};
  public Action Changed = delegate {};
+ public Action TrackQueued = delegate {};
  public bool EventsConnected;
  public ChatCommands Chat;
  public string NowPlaying="",CurrentTrackUrl="",VoteStatus="",TrackTitle="",TrackArtist="",TrackImage="";
@@ -306,6 +309,7 @@ public partial class Engine : IDisposable {
      else { o.status="reject"; o.note=ex.Message; }
     } catch(Exception) { o.status="uncertain"; o.note=L.T("Соединение оборвалось. Трек мог добавиться; проверьте очередь Spotify вручную."); }
     Save(); Changed();
+    if(o.status=="queued") {try {TrackQueued();}catch(Exception){/* Notifications must not change an accepted queue request. */}}
     if(retryDelay>0) { await Task.Delay(TimeSpan.FromSeconds(retryDelay),ct); return; }
    }
   }

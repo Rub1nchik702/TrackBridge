@@ -4,7 +4,7 @@
 
 <img src="assets/TrackBridge-icon.png" width="96" alt="TrackBridge icon">
 
-**By Rub1nchik · Windows · 1.9.0.2**
+**By Rub1nchik · Windows · 1.10.0**
 
 TrackBridge connects a custom Twitch Channel Points reward to your Spotify queue. Viewers submit a song link, the app finds a matching Spotify track and adds it to the end of your queue without interrupting the current song.
 
@@ -27,6 +27,10 @@ TrackBridge **1.9.0.2**, shown with demonstration data.
 ### About and DonateX
 
 ![About and DonateX](assets/interface-about-1.9.0.2-en.png)
+
+## Sound notifications
+
+A short, quiet two-note chime plays after Spotify confirms a viewer's track was added to the queue. In Settings, turn the sound on or off, adjust its level (0–40%; default 20%), or use Preview sound. It uses the Windows default audio output; overall loudness also depends on your system and speakers. Requests processed while a previous chime is playing do not overlap it. Failed requests, refunds and resumed reward finalization do not play a chime.
 
 ## Features
 

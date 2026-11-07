@@ -8,6 +8,9 @@ static class L {
  public static string Canonical(string value) {var pair=English.FirstOrDefault(p=>p.Value==value);return pair.Key??value;}
  public static string Runtime(string value) {return T(Canonical(value));}
  public static readonly Dictionary<string,string> English=new Dictionary<string,string> {
+{"Звук при добавлении зрительского трека","Sound when a viewer's track is added"},
+{"Громкость сигнала (%):","Signal volume (%):"},
+{"Прослушать сигнал","Preview sound"},
 {"Очистить сыгранные","Clear played tracks"},
 {"Скрыть выбранный","Hide selected"},
 {"Автоматически скрывать сыгранные","Auto-hide played tracks"},
