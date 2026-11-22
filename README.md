@@ -2,7 +2,7 @@
 
 # TrackBridge
 
-**Windows · 1.11.0 · by Rub1nchik**
+**Windows · 1.13.1 · by Rub1nchik**
 
 **English** · [Русский](README.ru.md)
 
@@ -10,7 +10,9 @@ Twitch Channel Points song requests → your Spotify queue. Viewers submit a lin
 
 **[Download](https://github.com/Rub1nchik702/TrackBridge/releases/latest)** · **[Setup with screenshots](https://github.com/Rub1nchik702/TrackBridge/blob/main/docs/GUIDE.md#setup)** · [Report a problem](https://github.com/Rub1nchik702/TrackBridge/issues/new/choose)
 
-![TrackBridge overview](assets/interface-overview-1.11.0-en.png)
+![Overview](assets/overview-1.13.1.png)
+
+![Settings](assets/settings-1.13.1.png)
 
 ## Features
 
@@ -27,7 +29,7 @@ Twitch Channel Points song requests → your Spotify queue. Viewers submit a lin
 2. In **Settings**, connect your Spotify and Twitch developer apps and select or create a reward. Follow the [illustrated guide](https://github.com/Rub1nchik702/TrackBridge/blob/main/docs/GUIDE.md#setup) for the exact fields.
 3. Start Spotify playback, open **Overview** and click **Start**. Wait for **Requests active**.
 
-Requires Windows 10/11, .NET Framework 4.7.2+, Spotify Premium and a Twitch channel with custom Channel Points rewards. Each broadcaster uses their own developer app Client IDs.
+Requires Windows 10/11, Spotify Premium and a Twitch channel with custom Channel Points rewards. Each broadcaster uses their own developer app Client IDs.
 
 ## Sound and history
 
@@ -39,11 +41,11 @@ Check request rows, then click **Hide selected** to hide them from the list. Thi
 
 Keep the `data` folder when updating manually; it contains your settings and account access. Do not share it. Automatic updates verify the publisher signature and SHA-256.
 
-Version 1.10.0 can update to 1.11.0 through the built-in updater.
+In 1.13.1 a failed chat notification leaves a confirmed refund final even when the order history is full.
 
 ## Source, rights and support
 
-Source is available in [src](src). Build on Windows with `powershell -NoProfile -File .\build.ps1`, or use GitHub Actions.
+The current [Rust source](rust) builds on Windows with stable Rust and the Windows SDK. Run `cargo build --release --locked --manifest-path rust/Cargo.toml`. The previous C# implementation is in [src](src).
 
 [License](LICENSE.txt): personal use and study are allowed; sale and redistribution of modified code or builds need the author's written permission. The TrackBridge name and logo identify official releases. This is source-available, not OSI open source.
 

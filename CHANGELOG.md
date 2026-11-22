@@ -1,5 +1,11 @@
 # Изменения
 
+## 1.13.1
+
+- Windows release built from the Rust implementation in `rust/`.
+- Keep confirmed refunds final when chat delivery fails and the 500-order history rolls over.
+- Configurable timeout for track selection. Uncertain Spotify submissions stay under manual review.
+
 ## 1.11.0 — 7 November 2026
 
 - Moved moderation into its own sidebar section with separate track and artist columns.
