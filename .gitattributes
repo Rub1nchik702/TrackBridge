@@ -1,0 +1,4 @@
+# Show the language of the current desktop application.
+/src/*.cs -linguist-detectable
+/build.ps1 -linguist-detectable
+/rust/tests/*.ps1 -linguist-detectable

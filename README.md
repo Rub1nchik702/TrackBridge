@@ -10,9 +10,9 @@ Twitch Channel Points song requests → your Spotify queue. Viewers submit a lin
 
 **[Download](https://github.com/Rub1nchik702/TrackBridge/releases/latest)** · **[Setup with screenshots](https://github.com/Rub1nchik702/TrackBridge/blob/main/docs/GUIDE.md#setup)** · [Report a problem](https://github.com/Rub1nchik702/TrackBridge/issues/new/choose)
 
-![Overview](assets/overview-1.13.1.png)
+![Overview](assets/overview-1.13.1-en.png)
 
-![Settings](assets/settings-1.13.1.png)
+![Settings](assets/settings-1.13.1-en.png)
 
 ## Features
 
