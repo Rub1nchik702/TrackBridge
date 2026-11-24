@@ -1,21 +1,18 @@
 param([string]$OutputDirectory = (Join-Path $PSScriptRoot 'dist'))
 $ErrorActionPreference = 'Stop'
-$compiler = Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'
-if (!(Test-Path -LiteralPath $compiler)) { throw '.NET Framework C# compiler is required.' }
-$files = @('Core.cs','Localizer.cs','SigningKey.cs','Resolver.cs','Updates.cs','ChatCommands.cs','Listener.cs','Program.cs','Dashboard.cs','Brand.cs','NotificationSound.cs','AudioImport.cs','ModernCheckBox.cs','Tests.cs','AssemblyInfo.cs') | ForEach-Object { Join-Path $PSScriptRoot ('src\' + $_) }
-$versionText = [IO.File]::ReadAllText((Join-Path $PSScriptRoot 'src\Updates.cs'))
-$version = [regex]::Match($versionText, 'Current\s*=\s*"([0-9.]+(?:-beta\.[0-9]+)?)"').Groups[1].Value
-if (!$version) { throw 'Version is missing.' }
+$manifest = Join-Path $PSScriptRoot 'rust/Cargo.toml'
+$artifacts = & cargo build --release --locked --manifest-path $manifest --message-format=json-render-diagnostics
+if ($LASTEXITCODE -ne 0) { throw 'Rust release build failed.' }
+$binary = $artifacts | ForEach-Object { $_ | ConvertFrom-Json } | Where-Object {
+    $_.reason -eq 'compiler-artifact' -and $_.target.name -ceq 'TrackBridge' -and $_.executable
+} | Select-Object -Last 1
+if (!$binary) { throw 'Cargo did not produce the TrackBridge executable.' }
+$version = [Diagnostics.FileVersionInfo]::GetVersionInfo($binary.executable).ProductVersion
+if (!$version) { throw 'Application version is missing.' }
 $stage = Join-Path $OutputDirectory 'TrackBridge'
 New-Item -ItemType Directory -Path $stage -Force | Out-Null
-$icon = Join-Path $PSScriptRoot 'assets\TrackBridge.ico'
-$iconResource = '/resource:' + $icon + ',TrackBridge.AppIcon'
 $exe = Join-Path $stage 'TrackBridge.exe'
-$audioCore = Join-Path $PSScriptRoot 'vendor\NAudio\NAudio.Core.dll'
-$audioWasapi = Join-Path $PSScriptRoot 'vendor\NAudio\NAudio.Wasapi.dll'
-$audioArguments = @(('/r:'+$audioCore), ('/r:'+$audioWasapi), ('/r:'+(Join-Path (Split-Path $compiler) 'netstandard.dll')), ('/resource:'+$audioCore+',TrackBridge.Dependencies.NAudio.Core.dll'), ('/resource:'+$audioWasapi+',TrackBridge.Dependencies.NAudio.Wasapi.dll'))
-& $compiler @audioArguments /nologo /target:winexe /optimize+ /debug- /utf8output /win32icon:$icon $iconResource /r:System.Windows.Forms.dll /r:System.Drawing.dll /r:System.Net.Http.dll /r:System.Web.dll /r:System.Web.Extensions.dll /r:System.Security.dll /r:System.IO.Compression.dll /r:System.IO.Compression.FileSystem.dll /out:$exe $files
-if ($LASTEXITCODE -ne 0) { throw 'Compilation failed.' }
+Copy-Item -LiteralPath $binary.executable -Destination $exe -Force
 $documents = @('README.md','README.ru.md','LICENSE.txt','THIRD-PARTY-NOTICES.txt','CHANGELOG.md','TRADEMARKS.md')
 foreach ($file in $documents) { Copy-Item -LiteralPath (Join-Path $PSScriptRoot $file) -Destination (Join-Path $stage $file) -Force }
 $readme = [Net.WebUtility]::HtmlEncode([IO.File]::ReadAllText((Join-Path $PSScriptRoot 'README.md')))

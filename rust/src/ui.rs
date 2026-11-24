@@ -39,11 +39,11 @@ impl AuthWindow{
         if close{if let Some(c)=cancel{c.store(true,Ordering::Relaxed)}*self=Self::default();}
     }
 }
-pub struct Desktop{v:View,tx:Sender<Cmd>,rx:Receiver<Reply>,exit:Cancel,join:Option<std::thread::JoinHandle<()>>,pending:usize,login:Option<Cancel>,auth_window:AuthWindow,page:usize,lang:String,ids:[String;2],rules:[String;2],minutes:i64,choice_minutes:i64,explicit:bool,title:String,cost:i64,selected:HashSet<String>,review:bool,choose:Option<(String,String)>,log:VecDeque<String>,scroll:bool,root:PathBuf,tray:Option<(TrayIcon,MenuItem,MenuItem)>,update_rx:Option<Receiver<anyhow::Result<Option<PathBuf>>>>,stage:Option<PathBuf>,next_update:i64,preview:bool,shot:Option<PathBuf>,frames:u32,art_url:String,art:Option<TextureHandle>,art_rx:Option<Receiver<(String,Option<ColorImage>)>>,diag:Option<PathBuf>}
+pub struct Desktop{v:View,tx:Sender<Cmd>,rx:Receiver<Reply>,exit:Cancel,join:Option<std::thread::JoinHandle<()>>,pending:usize,login:Option<Cancel>,auth_window:AuthWindow,page:usize,lang:String,ids:[String;2],rules:[String;2],minutes:i64,choice_minutes:i64,viewer_limit:i64,viewer_window:i64,explicit:bool,title:String,cost:i64,selected:HashSet<String>,review:bool,choose:Option<(String,String)>,log:VecDeque<String>,scroll:bool,root:PathBuf,tray:Option<(TrayIcon,MenuItem,MenuItem)>,update_rx:Option<Receiver<anyhow::Result<Option<PathBuf>>>>,stage:Option<PathBuf>,next_update:i64,preview:bool,shot:Option<PathBuf>,frames:u32,art_url:String,art:Option<TextureHandle>,art_rx:Option<Receiver<(String,Option<ColorImage>)>>,diag:Option<PathBuf>}
 impl Desktop{
     pub fn new(v:View,tx:Sender<Cmd>,rx:Receiver<Reply>,exit:Cancel,join:std::thread::JoinHandle<()>,root:PathBuf,preview:bool,shot:Option<PathBuf>,settings:bool,diag:Option<PathBuf>)->Self{
         let lang=s(&v.prefs,"language").to_string();let en=lang=="en";let tray=(||{let menu=Menu::new();let open=MenuItem::new(if en{"Open"}else{"Открыть"},true,None);let quit=MenuItem::new(if en{"Exit"}else{"Выйти"},true,None);menu.append(&open).ok()?;menu.append(&quit).ok()?;let img=crate::icon();let icon=tray_icon::Icon::from_rgba(img.rgba,img.width,img.height).ok()?;Some((TrayIconBuilder::new().with_menu(Box::new(menu)).with_icon(icon).with_tooltip("TrackBridge").build().ok()?,open,quit))})();
-        Self{ids:[s(&v.prefs,"twitchId").into(),s(&v.prefs,"spotifyId").into()],rules:[s(&v.prefs,"blockedTracks").into(),s(&v.prefs,"blockedArtists").into()],minutes:n(&v.prefs,"maxTrackMinutes"),choice_minutes:n(&v.prefs,"trackChoiceMinutes"),explicit:b(&v.prefs,"blockExplicit"),v,tx,rx,exit,join:Some(join),pending:0,login:None,auth_window:AuthWindow::default(),page:if settings{4}else{0},lang,title:if en{"Request a song"}else{"Заказать трек"}.into(),cost:500,selected:HashSet::new(),review:false,choose:None,log:VecDeque::new(),scroll:true,root,tray,update_rx:None,stage:None,next_update:0,preview,shot,frames:0,art_url:String::new(),art:None,art_rx:None,diag}
+        Self{ids:[s(&v.prefs,"twitchId").into(),s(&v.prefs,"spotifyId").into()],rules:[s(&v.prefs,"blockedTracks").into(),s(&v.prefs,"blockedArtists").into()],minutes:n(&v.prefs,"maxTrackMinutes"),viewer_limit:n(&v.prefs,"viewerTrackLimit"),viewer_window:n(&v.prefs,"viewerWindowMinutes"),choice_minutes:n(&v.prefs,"trackChoiceMinutes"),explicit:b(&v.prefs,"blockExplicit"),v,tx,rx,exit,join:Some(join),pending:0,login:None,auth_window:AuthWindow::default(),page:if settings{4}else{0},lang,title:if en{"Request a song"}else{"Заказать трек"}.into(),cost:500,selected:HashSet::new(),review:false,choose:None,log:VecDeque::new(),scroll:true,root,tray,update_rx:None,stage:None,next_update:0,preview,shot,frames:0,art_url:String::new(),art:None,art_rx:None,diag}
     }
     fn t(&self,ru:&'static str,en:&'static str)->&'static str{if self.lang=="en"{en}else{ru}}
     fn send(&mut self,c:Cmd){if self.tx.send(c).is_ok(){self.pending+=1}}
@@ -100,11 +100,60 @@ impl Desktop{
     }
     fn moderation(&mut self,ui:&mut Ui){ui.add_enabled_ui(!self.v.running,|ui|{
         ui.horizontal(|ui|{ui.label(self.t("Лимит минут (0 — без лимита)","Limit in minutes (0 for unlimited)"));ui.add(DragValue::new(&mut self.minutes).range(0..=1440));});let label=self.t("Запретить Explicit","Block explicit tracks");ui.checkbox(&mut self.explicit,label);ui.add_space(10.);
+        ui.horizontal(|ui| {
+            ui.label(self.t("Лимит на зрителя","Viewer limit"));
+            ui.add(DragValue::new(&mut self.viewer_limit).range(1..=100));
+            ui.label(self.t("треков за","tracks per"));
+            ui.add(DragValue::new(&mut self.viewer_window).range(1..=1440));
+            ui.label(self.t("минут","minutes"));
+        });
         ui.columns(2,|cols|{for(i,col)in cols.iter_mut().enumerate(){col.strong(if i==0{self.t("Запрещённые треки","Blocked tracks")}else{self.t("Запрещённые исполнители","Blocked artists")});col.label(self.t("По одному на строку","One per line"));col.add(TextEdit::multiline(&mut self.rules[i]).desired_rows(12).desired_width(f32::INFINITY));}});
-        if ui.button(self.t("Сохранить правила","Save rules")).clicked(){self.send(Cmd::Set(json!({"maxTrackMinutes":self.minutes,"blockExplicit":self.explicit,"blockedTracks":self.rules[0],"blockedArtists":self.rules[1]})));}
+        if ui.button(self.t("Сохранить правила","Save rules")).clicked(){self.send(Cmd::Set(json!({"viewerTrackLimit":self.viewer_limit,"viewerWindowMinutes":self.viewer_window,"maxTrackMinutes":self.minutes,"blockExplicit":self.explicit,"blockedTracks":self.rules[0],"blockedArtists":self.rules[1]})));}
     });}
+    fn connection_help(&self, ui: &mut Ui) {
+        ui.heading(self.t("Подключение", "Connections"));
+        ui.horizontal_wrapped(|ui| {
+            ui.visuals_mut().override_text_color = None;
+            ui.hyperlink_to("Twitch Developer Console", "https://dev.twitch.tv/console/apps");
+            ui.hyperlink_to("Spotify Developer Dashboard", "https://developer.spotify.com/dashboard");
+        });
+        egui::CollapsingHeader::new(self.t("Как подключить Twitch и Spotify", "How to connect Twitch and Spotify"))
+            .id_salt("connection-help")
+            .show(ui, |ui| {
+                ui.strong("Twitch");
+                ui.label(self.t(
+                    "1. Войдите в консоль разработчика аккаунтом владельца канала и зарегистрируйте приложение типа Public. Если форма требует OAuth Redirect URL, добавьте http://localhost:43821.",
+                    "1. Sign in to the developer console as the channel owner and register a Public app. If the form requires an OAuth Redirect URL, add http://localhost:43821.",
+                ));
+                ui.label(self.t(
+                    "2. Откройте Manage, скопируйте Client ID в поле Twitch Client ID и нажмите «Подключить» рядом с ним. Введите код устройства на открывшейся странице Twitch и подтвердите доступ.",
+                    "2. Open Manage, copy the Client ID into Twitch Client ID, and click Connect next to it. Enter the device code on the Twitch page that opens and approve access.",
+                ));
+                ui.add_space(6.0);
+                ui.strong("Spotify");
+                ui.label(self.t(
+                    "1. Создайте приложение в кабинете Spotify, выберите Web API и добавьте точный адрес в Redirect URIs.",
+                    "1. Create an app in the Spotify dashboard, select Web API, and add the exact address to Redirect URIs.",
+                ));
+                ui.horizontal_wrapped(|ui| {
+                    ui.monospace(crate::api::SPOTIFY_REDIRECT_URI);
+                    if ui.small_button(self.t("Копировать адрес", "Copy address")).clicked() {
+                        ui.ctx().copy_text(crate::api::SPOTIFY_REDIRECT_URI.to_owned());
+                    }
+                });
+                ui.label(self.t(
+                    "2. Сохраните приложение, вставьте его Client ID в поле Spotify Client ID и нажмите «Подключить» рядом с ним. Разрешите доступ в браузере с аккаунта Spotify Premium, который будет воспроизводить музыку.",
+                    "2. Save the app, paste its Client ID into Spotify Client ID, and click Connect next to it. Approve access in your browser using the Spotify Premium account that will play music.",
+                ));
+                ui.small(self.t(
+                    "Если Spotify требует добавить пользователя, добавьте этот аккаунт в Users and Access. Для подключения в TrackBridge достаточно Client ID.",
+                    "If Spotify requires an allowed user, add that account under Users and Access. TrackBridge only needs the Client ID.",
+                ));
+            });
+        ui.add_space(8.0);
+    }
     fn settings(&mut self,ui:&mut Ui){let en=self.lang=="en";ui.horizontal(|ui|{ui.label(self.t("Язык","Language"));for(code,label)in [("ru","Русский"),("en","English")]{if ui.selectable_label(self.lang==code,label).clicked(){self.lang=code.into();self.set("language",json!(code));if let Some((_,open,quit))=&self.tray{open.set_text(self.t("Открыть","Open"));quit.set_text(self.t("Выход","Exit"));}}}});
-        ui.separator();ui.add_enabled_ui(!self.v.running&&self.pending==0,|ui|{for(i,name)in ["Twitch","Spotify"].into_iter().enumerate(){ui.horizontal(|ui|{ui.label(format!("{name} Client ID"));ui.text_edit_singleline(&mut self.ids[i]);if ui.button(self.t("Подключить","Connect")).clicked(){self.ids();let c=Arc::new(AtomicBool::new(false));self.login=Some(c.clone());let (tx,rx)=mpsc::channel();self.auth_window=AuthWindow::new(rx);self.send(Cmd::Login(i==1,c,tx))}ui.label(if self.v.account[i]{self.t("Подключён","Connected")}else{"—"});});}
+        ui.separator();self.connection_help(ui);ui.add_enabled_ui(!self.v.running&&self.pending==0,|ui|{for(i,name)in ["Twitch","Spotify"].into_iter().enumerate(){ui.horizontal(|ui|{ui.label(format!("{name} Client ID"));ui.text_edit_singleline(&mut self.ids[i]);if ui.button(self.t("Подключить","Connect")).clicked(){self.ids();let c=Arc::new(AtomicBool::new(false));self.login=Some(c.clone());let (tx,rx)=mpsc::channel();self.auth_window=AuthWindow::new(rx);self.send(Cmd::Login(i==1,c,tx))}ui.label(if self.v.account[i]{self.t("Подключён","Connected")}else{"—"});});}
         if ui.button(self.t("Сохранить Client ID","Save Client IDs")).clicked(){self.ids()}
         ui.separator();ui.horizontal(|ui|{let rewards=self.v.rewards.clone();let current=s(&self.v.prefs,"reward");let label=rewards.iter().find(|r|s(r,"id")==current).map(|r|s(r,"title")).unwrap_or(self.t("Выберите награду","Select reward"));ComboBox::from_id_salt("reward").selected_text(label).show_ui(ui,|ui|{for r in &rewards{if ui.selectable_label(self.v.prefs["reward"]==r["id"],s(r,"title")).clicked(){self.set("reward",r["id"].clone())}}});if ui.button(self.t("Обновить список","Refresh rewards")).clicked(){self.ids();self.send(Cmd::Rewards)}});ui.horizontal(|ui|{ui.text_edit_singleline(&mut self.title);ui.add(DragValue::new(&mut self.cost).range(1..=1_000_000_000));if ui.button(self.t("Создать награду","Create reward")).clicked(){self.send(Cmd::Create(self.title.clone(),self.cost))}});
         });if let Some(c)=&self.login{if ui.button(self.t("Отменить подключение","Cancel connection")).clicked(){c.store(true,Ordering::Relaxed)}}

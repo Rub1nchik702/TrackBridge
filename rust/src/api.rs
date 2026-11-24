@@ -17,6 +17,8 @@ impl DevicePrompt{
 pub type Cancel=Arc<AtomicBool>;
 pub fn check(c:&Cancel)->Result<()>{ensure!(!c.load(Ordering::Relaxed),"Отменено / Canceled");Ok(())}
 pub fn wait(c:&Cancel,secs:u64)->Result<()>{for _ in 0..secs*10{check(c)?;std::thread::sleep(Duration::from_millis(100))}check(c)}
+pub const SPOTIFY_REDIRECT_URI: &str = "http://127.0.0.1:43821/callback";
+
 pub fn client()->ureq::Agent{ureq::AgentBuilder::new().tls_connector(Arc::new(native_tls::TlsConnector::new().unwrap())).timeout(Duration::from_secs(20)).redirects(0).user_agent(concat!("TrackBridge/",env!("TRACKBRIDGE_VERSION"))).build()}
 pub fn enc(x:&str)->String{url::form_urlencoded::byte_serialize(x.as_bytes()).collect()}
 pub fn open_url(u:&str)->Result<()>{let url=Url::parse(u)?;ensure!(url.scheme()=="https","HTTPS required");unsafe{
@@ -69,7 +71,7 @@ impl Api{
         }
         let listener=TcpListener::bind(("127.0.0.1",43821))?;listener.set_nonblocking(true)?;
         let random=||URL_SAFE_NO_PAD.encode(rand::random::<[u8;32]>());let state=random();let verifier=random();
-        let redirect="http://127.0.0.1:43821/callback";let mut url=Url::parse("https://accounts.spotify.com/authorize")?;
+        let redirect=SPOTIFY_REDIRECT_URI;let mut url=Url::parse("https://accounts.spotify.com/authorize")?;
         url.query_pairs_mut().extend_pairs([("client_id",id.as_str()),("response_type","code"),("redirect_uri",redirect),("scope","user-modify-playback-state user-read-playback-state"),("state",&state),("code_challenge_method","S256"),("code_challenge",&URL_SAFE_NO_PAD.encode(Sha256::digest(verifier.as_bytes())))]);
         open_url(url.as_str())?;let end=Instant::now()+Duration::from_secs(240);
         while Instant::now()<end{check(c)?;match listener.accept(){

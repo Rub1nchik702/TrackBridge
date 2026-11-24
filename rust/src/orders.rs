@@ -126,19 +126,23 @@ pub fn process(a:&Api,p:&mut Profile,i:usize)->Result<Option<String>>{
             p.save()?;
         },Err(e) if e.is::<NeedsTrack>()=>{let o=&mut p.v["orders"][i];o["status"]=json!("needs_track");o["choiceSince"]=json!(now());o["note"]=json!(e.to_string());p.save()?},Err(e) if e.is::<Reject>()=>{let o=&mut p.v["orders"][i];o["status"]=json!("reject");o["notify"]=json!(true);o["note"]=json!(e.to_string());p.save()?},Err(e)=>return Err(e)
     }}
-    let o=p.v["orders"][i].clone();if matches!(s(&o,"status"),"queued"|"reject"){let added=o["status"]=="queued";match a.mark(p,&o,added){Ok(())=>p.v["orders"][i]["status"]=json!(if added{"done"}else{"canceled"}),Err(e) if matches!(status(&e),400|404)=>p.v["orders"][i]["status"]=json!("manual"),Err(e)=>return Err(e)}
+    let o=p.v["orders"][i].clone();if matches!(s(&o,"status"),"queued"|"reject"){let added=o["status"]=="queued";p.v["orders"][i]["refundPending"]=json!(!added);match a.mark(p,&o,added){Ok(())=>p.v["orders"][i]["status"]=json!(if added{"done"}else{"canceled"}),Err(e) if matches!(status(&e),400|404)=>p.v["orders"][i]["status"]=json!("manual"),Err(e)=>return Err(e)}
         let notify=p.v["orders"][i]["status"]=="canceled" && b(&p.v["orders"][i],"notify") && !b(&p.v["orders"][i],"notificationAttempted");
         p.save()?;
         // Completed orders may shift when saving trims the history.
         if !notify{return Ok(None)}
     }
-    let o=p.v["orders"][i].clone();if o["status"]=="canceled"&&b(&o,"notify")&&!b(&o,"notificationAttempted"){p.v["orders"][i]["notificationAttempted"]=json!(true);p.save()?;if b(&p.v,"chatAllowed"){let user:String=s(&o,"user").chars().filter(|x|x.is_alphanumeric()||*x=='_').collect();let lang=s(&p.v,"language");let reason=crate::language::message(lang,s(&o,"note"));let refund=if lang=="en"{"Points refunded."}else{"Баллы возвращены."};if let Err(error)=a.chat(p,&format!("@{user} {refund} {reason}").chars().take(450).collect::<String>()){
+    let o=p.v["orders"][i].clone();if o["status"]=="canceled"&&b(&o,"notify")&&!b(&o,"notificationAttempted"){p.v["orders"][i]["notificationAttempted"]=json!(true);p.save()?;if b(&p.v,"chatAllowed"){let user:String=s(&o,"user").chars().filter(|x|x.is_alphanumeric()||*x=='_').collect();let lang=s(&p.v,"language");let reason=p.refund_reason(&o,now())?;let refund=if lang=="en"{"Points refunded."}else{"Баллы возвращены."};if let Err(error)=a.chat(p,&format!("@{user} {refund} {reason}").chars().take(450).collect::<String>()){
             if error.is::<SaveError>(){return Err(error)}
             return Ok(Some(format!("Уведомление о возврате / Refund notification: {}",describe(&error))));
         }}}
     Ok(None)
 }
 pub fn defer(p:&mut Profile,i:usize,e:&anyhow::Error)->Result<()>{
+    if status(e)==429 {
+        p.v["orders"][i]["nextAttempt"]=json!(now().saturating_add(retry(e).max(1)));
+        return p.save()
+    }
     let o=&mut p.v["orders"][i];let attempts=n(o,"attempts")+1;o["attempts"]=json!(attempts);o["nextAttempt"]=json!(now()+(15*attempts).min(120));if o["status"]!="reject"{o["note"]=json!(describe(e));}
     if o["status"]=="sending"{o["status"]=json!("uncertain")}else if attempts>=3{if o["status"]=="pending"{o["status"]=json!("reject");o["notify"]=json!(true);o["attempts"]=json!(0)}else if matches!(s(o,"status"),"queued"|"reject"){o["status"]=json!("manual")}}
     p.save()

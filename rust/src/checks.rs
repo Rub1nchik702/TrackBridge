@@ -61,7 +61,7 @@ fn retry_after_restart(dir:&std::path::Path,timed_refund:bool)->Result<usize>{
             let mut body=vec![0;length];reader.read_exact(&mut body)?;
             let status=if first.starts_with("POST /spotify/me/player/queue?"){adds+=1;"204 No Content"}
             else if first.starts_with("POST /twitch/chat/messages "){chats+=1;"503 Service Unavailable"}
-            else{ensure!(first.starts_with("PATCH /twitch/channel_points/custom_rewards/redemptions?")&&first.contains("id=redemption"));
+            else{ensure!(first.starts_with("PATCH /twitch/channel_points/custom_rewards/redemptions?")&&first.contains("reward_id=reward&")&&first.contains("id=redemption"));
                 ensure!(serde_json::from_slice::<serde_json::Value>(&body)?["status"]==if timed_refund{"CANCELED"}else{"FULFILLED"});confirmations+=1;
                 if confirmations==1{"503 Service Unavailable"}else{"200 OK"}};
             write!(socket,"HTTP/1.1 {status}\r\nConnection: close\r\nContent-Length: 0\r\n\r\n")?;
@@ -74,6 +74,7 @@ fn retry_after_restart(dir:&std::path::Path,timed_refund:bool)->Result<usize>{
     let mut reopened=Profile::open(fixture.clone())?;
     ensure!(reopened.v["orders"][0]["status"]==if timed_refund{"reject"}else{"queued"});
     ensure!(!reopened.accept(&event)?);
+    reopened.v["reward"]=json!("replacement");
     let due=n(&reopened.v["orders"][0],"nextAttempt");
     ensure!(reopened.next(due-1).is_none()&&reopened.next(due)==Some(0));
     let mut index=0;

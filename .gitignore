@@ -22,3 +22,4 @@
 self-test.txt
 ui-preview.png
 ui-settings-preview.png
+/rust/target/

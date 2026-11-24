@@ -3,9 +3,13 @@ on:
   push:
     branches: [main]
     paths:
-      - 'src/**'
+      - 'rust/**'
       - 'build.ps1'
-      - 'assets/TrackBridge.ico'
+      - 'README*.md'
+      - 'LICENSE.txt'
+      - 'THIRD-PARTY-NOTICES.txt'
+      - 'CHANGELOG.md'
+      - 'TRADEMARKS.md'
       - '.github/workflows/build-windows.yml'
   workflow_dispatch:
 permissions:
@@ -13,15 +17,26 @@ permissions:
 jobs:
   build:
     runs-on: windows-2022
-    timeout-minutes: 15
+    timeout-minutes: 45
+    env:
+      RUSTUP_TOOLCHAIN: stable-x86_64-pc-windows-msvc
     steps:
       - name: Checkout published source
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
         with:
           persist-credentials: false
       - name: Compile and package Windows application
         shell: powershell
         run: .\build.ps1
+      - name: Test packaged application
+        shell: powershell
+        run: |
+          $archive = Get-Item dist/TrackBridge-*-win.zip
+          $testDir = Join-Path $env:RUNNER_TEMP 'TrackBridge-package-test'
+          Expand-Archive -LiteralPath $archive.FullName -DestinationPath $testDir
+          $run = Start-Process -FilePath (Join-Path $testDir 'TrackBridge.exe') -ArgumentList '--self-test' -Wait -PassThru -WindowStyle Hidden
+          if ($run.ExitCode -ne 0) { throw 'Packaged application failed its self-test.' }
+          Get-Content (Join-Path $testDir 'self-test.txt')
       - name: Upload manual-install build
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:

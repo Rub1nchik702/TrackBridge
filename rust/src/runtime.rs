@@ -7,7 +7,7 @@ pub enum Reply{State(View),Log(String),Ready}
 pub struct Engine{pub p:Profile,a:Api,tx:Sender<Reply>,pub player:Player,rewards:Vec<Value>,device:String,session:Option<(Cancel,Receiver<Event>)>,connected:bool,next_poll:i64,next_player:i64,next_count:i64,next_validate:i64,last_retry:i64}
 impl Engine{
     pub fn new(p:Profile,tx:Sender<Reply>)->Self{Self{p,a:Api::new(),tx,player:Player::default(),rewards:vec![],device:String::new(),session:None,connected:false,next_poll:0,next_player:0,next_count:0,next_validate:0,last_retry:0}}
-    pub fn view(&self)->View{let mut prefs=self.p.v.clone();let orders=prefs["orders"].take().as_array().unwrap().clone();for k in ["orders","recentReceipts","twitch","spotify"]{prefs.as_object_mut().unwrap().remove(k);}
+    pub fn view(&self)->View{let mut prefs=self.p.v.clone();let orders=prefs["orders"].take().as_array().unwrap().clone();for k in ["orders","recentReceipts","quotaArchive","twitch","spotify"]{prefs.as_object_mut().unwrap().remove(k);}
         View{prefs,orders,rewards:self.rewards.clone(),running:self.session.is_some(),connected:self.connected,device:self.device.clone(),player:self.player.data.clone(),viewers:self.player.viewers,votes:self.player.voters.len(),threshold:self.player.threshold,account:["twitch","spotify"].map(|k|!s(&self.p.v[k],"access_token").is_empty())}
     }
     fn publish(&self){let _=self.tx.send(Reply::State(self.view()));}
@@ -20,6 +20,11 @@ impl Engine{
         Cmd::Set(v)=>{for(k,val)in v.as_object().context("Invalid settings")?{
             match k.as_str(){"twitchId"|"spotifyId" if self.p.v[k]!=*val=>{ensure!(self.session.is_none(),"Stop first");let provider=k.trim_end_matches("Id");self.p.v[provider]=token();if provider=="twitch"{self.p.v["reward"]=json!("");self.p.v["broadcaster"]=json!("");self.rewards.clear()}else{self.device.clear()}},
                 "twitchId"|"spotifyId"|"reward"|"maxTrackMinutes"|"blockExplicit"|"blockedTracks"|"blockedArtists"|"skipAutomatic"|"skipManualVotes"|"requestSoundName"=>ensure!(self.session.is_none(),"Stop first"),
+                "viewerTrackLimit" | "viewerWindowMinutes" => {
+                    ensure!(self.session.is_none(),"Stop first");
+                    let max=if k=="viewerTrackLimit"{100}else{1440};
+                    ensure!(val.as_i64().is_some_and(|v|(1..=max).contains(&v)),"Invalid viewer limit");
+                }
                 "trackChoiceMinutes"=>ensure!(val.as_i64().is_some_and(|m|(0..=1440).contains(&m)),"Invalid selection timeout"),
                 "autoHidePlayed"|"requestSoundEnabled"|"requestSoundVolume"|"votingEnabled"|"language"=>(),_=>bail!("Unknown setting")}
             self.p.v[k]=val.clone()
@@ -39,7 +44,7 @@ impl Engine{
             let o=self.p.v["orders"].as_array_mut().unwrap().iter_mut().find(|o|o["id"]==id && o["broadcaster"]==broadcaster && o["status"]=="needs_track").context("Order unavailable")?;
             o["uri"]=json!(uri);o["status"]=json!("pending");o["note"]=json!("");o["attempts"]=json!(0);o["nextAttempt"]=json!(0);self.p.save()?
         },
-        Cmd::Resolve(id,added)=>{let i=self.p.v["orders"].as_array().unwrap().iter().position(|o|s(o,"id")==id&&s(o,"broadcaster")==s(&self.p.v,"broadcaster")&&(!added||!b(o,"choiceTimedOut"))&&(matches!(s(o,"status"),"uncertain"|"manual")||(!added&&o["status"]=="needs_track"))).context("Order unavailable")?;let o=self.p.v["orders"][i].clone();self.a.mark(&mut self.p,&o,added)?;self.p.v["orders"][i]["status"]=json!(if added{"done"}else{"canceled"});self.p.save()?},
+        Cmd::Resolve(id,added)=>{let i=self.p.v["orders"].as_array().unwrap().iter().position(|o|s(o,"id")==id&&s(o,"broadcaster")==s(&self.p.v,"broadcaster")&&(!added||!b(o,"choiceTimedOut"))&&(matches!(s(o,"status"),"uncertain"|"manual")||(!added&&o["status"]=="needs_track"))).context("Order unavailable")?;let o=self.p.v["orders"][i].clone();self.a.mark(&mut self.p,&o,added)?;self.p.v["orders"][i]["refundPending"]=json!(!added);self.p.v["orders"][i]["status"]=json!(if added{"done"}else{"canceled"});self.p.save()?},
         Cmd::Import(path)=>sound::import(&mut self.p,&path)?,Cmd::Preview=>sound::play(&self.p)?,Cmd::Quit=>self.stop()
     }Ok(())}
     fn event(&mut self,e:Event)->Result<()>{match e{

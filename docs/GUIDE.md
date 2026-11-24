@@ -186,7 +186,7 @@ The player card shows the track title, artist, Spotify cover when available and 
 
 ## Build from source
 
-On Windows run `powershell -NoProfile -File .\build.ps1` with .NET Framework 4.7.2 or newer and its C# compiler. Output goes to `dist`. GitHub Actions builds the same source on main pushes and manual dispatch, without obfuscation. Artifacts are associated with a commit; byte-for-byte reproducibility is not claimed.
+On Windows run `powershell -NoProfile -File .\build.ps1` with stable Rust (MSVC), the Visual C++ build tools and the Windows SDK installed. Output goes to `dist`. GitHub Actions builds the same source on main pushes and manual dispatch, without obfuscation. Artifacts are associated with a commit; byte-for-byte reproducibility is not claimed.
 
 The workflow receives no secrets and does not sign updater packages. Actions artifacts are for manual installation; official automatic updates are additionally signed by the author outside CI. src/SigningKey.cs contains only the public verification key. Never publish data, .updates, tokens, private keys or local history. Available source does not guarantee that any third-party binary is safe.
 
