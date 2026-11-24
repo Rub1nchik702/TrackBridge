@@ -8,7 +8,7 @@
 
 Заказы музыки за баллы Twitch → ваша очередь Spotify. Зритель отправляет ссылку, приложение добавляет найденный трек, не прерывая текущую песню.
 
-**[Скачать](https://github.com/Rub1nchik702/TrackBridge/releases/latest)** · **[Настройка со скриншотами](https://github.com/Rub1nchik702/TrackBridge/blob/main/docs/GUIDE.ru.md#настройка-по-шагам)** · [Сообщить об ошибке](https://github.com/Rub1nchik702/TrackBridge/issues/new/choose)
+**[Скачать TrackBridge.exe](https://github.com/Rub1nchik702/TrackBridge/releases/download/v1.13.1/TrackBridge.exe)** · **[Настройка со скриншотами](https://github.com/Rub1nchik702/TrackBridge/blob/main/docs/GUIDE.ru.md#настройка-по-шагам)** · [Сообщить об ошибке](https://github.com/Rub1nchik702/TrackBridge/issues/new/choose)
 
 ![Обзор](assets/overview-1.13.1.png)
 
@@ -25,7 +25,7 @@
 
 ## Быстрый запуск
 
-1. Скачайте ZIP, распакуйте все файлы в папку, доступную для записи, и запустите `TrackBridge.exe`.
+1. Скачайте `TrackBridge.exe`, сохраните его в папку, доступную для записи, и запустите.
 2. В **Настройках** подключите приложения разработчика Spotify и Twitch, создайте или выберите награду. Поля показаны в [пошаговой инструкции](https://github.com/Rub1nchik702/TrackBridge/blob/main/docs/GUIDE.ru.md#настройка-по-шагам).
 3. Включите музыку в Spotify, откройте **Обзор** и нажмите **Запустить**. Дождитесь статуса **Приём заказов активен**.
 

@@ -8,7 +8,7 @@
 
 Twitch Channel Points song requests → your Spotify queue. Viewers submit a link; TrackBridge adds a matching Spotify track without interrupting the current song.
 
-**[Download](https://github.com/Rub1nchik702/TrackBridge/releases/latest)** · **[Setup with screenshots](https://github.com/Rub1nchik702/TrackBridge/blob/main/docs/GUIDE.md#setup)** · [Report a problem](https://github.com/Rub1nchik702/TrackBridge/issues/new/choose)
+**[Download TrackBridge.exe](https://github.com/Rub1nchik702/TrackBridge/releases/download/v1.13.1/TrackBridge.exe)** · **[Setup with screenshots](https://github.com/Rub1nchik702/TrackBridge/blob/main/docs/GUIDE.md#setup)** · [Report a problem](https://github.com/Rub1nchik702/TrackBridge/issues/new/choose)
 
 ![Overview](assets/overview-1.13.1-en.png)
 
@@ -25,7 +25,7 @@ Twitch Channel Points song requests → your Spotify queue. Viewers submit a lin
 
 ## Get started
 
-1. Download the ZIP, extract all files into a writable folder and run `TrackBridge.exe`.
+1. Download `TrackBridge.exe`, save it to a writable folder, and run it.
 2. In **Settings**, connect your Spotify and Twitch developer apps and select or create a reward. Follow the [illustrated guide](https://github.com/Rub1nchik702/TrackBridge/blob/main/docs/GUIDE.md#setup) for the exact fields.
 3. Start Spotify playback, open **Overview** and click **Start**. Wait for **Requests active**.
 
