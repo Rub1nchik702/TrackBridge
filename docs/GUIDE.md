@@ -6,7 +6,7 @@
 
 <img src="../assets/TrackBridge-icon.png" width="96" alt="TrackBridge icon">
 
-**By Rub1nchik · Windows · 1.11.0**
+**By Rub1nchik · Windows · 1.13.1**
 
 TrackBridge connects a custom Twitch Channel Points reward to your Spotify queue. Viewers submit a song link, the app finds a matching Spotify track and adds it to the end of your queue without interrupting the current song.
 
@@ -59,9 +59,9 @@ A short, quiet two-note chime plays after Spotify confirms a viewer's track was 
 
 ## Download
 
-Get the Windows ZIP from [Releases](https://github.com/Rub1nchik702/TrackBridge/releases). Extract the entire archive to a writable folder and run `TrackBridge.exe`.
+[Download TrackBridge.exe](https://github.com/Rub1nchik702/TrackBridge/releases/download/v1.13.1/TrackBridge.exe) directly, save it to a writable folder, and run it. To update an existing installation, close TrackBridge and replace `TrackBridge.exe` in the same folder so the app can keep using your `data` folder.
 
-Requires Windows 10/11, .NET Framework 4.7.2 or later, Spotify Premium and an active Spotify player. Your Twitch channel must support custom Channel Points rewards. The executable has no Windows code-signing certificate. Public-source builds use no obfuscation.
+Requires Windows 10/11, Spotify Premium and an active Spotify player. Your Twitch channel must support custom Channel Points rewards. The executable has no Windows code-signing certificate. Public-source builds use no obfuscation.
 
 ## Setup
 
@@ -69,7 +69,7 @@ Screenshots below show TrackBridge 1.9.0.2 with demonstration data. Replace the 
 
 ### 1. Open Settings
 
-Extract the entire Windows ZIP into a writable folder, run `TrackBridge.exe`, choose **EN** if needed, and open **Settings** in the sidebar.
+Run the downloaded `TrackBridge.exe`, choose **English** in **Settings** if needed, and go to **Connections**.
 
 ![Step 1 — open Settings](../assets/setup-step-1-en.png)
 
