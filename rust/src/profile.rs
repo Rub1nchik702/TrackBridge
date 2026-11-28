@@ -35,6 +35,12 @@ pub fn now()->i64{std::time::SystemTime::now().duration_since(std::time::UNIX_EP
 pub fn token()->Value{json!({"access_token":"","refresh_token":"","expires":0})}
 pub fn defaults()->Value{json!({"language":if unsafe{GetUserDefaultUILanguage()} & 0x3ff == 0x19 {"ru"}else{"en"},"orders":[],"recentReceipts":[],"autoHidePlayed":false,"requestSoundEnabled":true,"requestSoundVolume":20,"requestSoundName":"","chatAllowed":false,"chatReadAllowed":false,"skipAutomatic":true,"skipManualVotes":5,"votingEnabled":true,"blockExplicit":false,"viewerTrackLimit":3,"viewerWindowMinutes":30,"quotaArchive":[],"trackChoiceMinutes":15,"maxTrackMinutes":10,"blockedTracks":"","blockedArtists":"","twitchId":"","spotifyId":"","broadcaster":"","reward":"","twitch":token(),"spotify":token()})}
 pub fn needs_review(o:&Value)->bool{matches!(s(o,"status"),"manual"|"uncertain"|"needs_track")}
+pub fn track_choice_deadline(order: &Value, minutes: i64) -> Option<i64> {
+    let minutes = minutes.clamp(0, 1440);
+    let since = n(order, "choiceSince");
+    (order["status"] == "needs_track" && since > 0 && minutes > 0)
+        .then(|| since.saturating_add(minutes * 60))
+}
 pub fn finished(o:&Value)->bool{s(o,"status")=="done" || (s(o,"status")=="canceled" && (!b(o,"notify")||b(o,"notificationAttempted")))}
 fn counts_for_quota(order: &Value) -> bool {
     !matches!(s(order, "status"), "reject" | "canceled") && !b(order, "refundPending")
@@ -218,8 +224,7 @@ impl Profile{
         if minutes==0{return Ok(false)}
         let mut changed=false;
         for order in self.v["orders"].as_array_mut().unwrap(){
-            let since=n(order,"choiceSince");
-            if order["status"]!="needs_track" || since<=0 || at<since.saturating_add(minutes*60){continue}
+            if !track_choice_deadline(order, minutes).is_some_and(|deadline| at >= deadline) { continue }
             order["status"]=json!("reject");
             order["choiceTimedOut"]=json!(true);
             order["notify"]=json!(true);

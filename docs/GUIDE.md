@@ -6,7 +6,7 @@
 
 <img src="../assets/TrackBridge-icon.png" width="96" alt="TrackBridge icon">
 
-**By Rub1nchik · Windows · 1.13.1**
+**By Rub1nchik · Windows · 1.14.0**
 
 TrackBridge connects a custom Twitch Channel Points reward to your Spotify queue. Viewers submit a song link, the app finds a matching Spotify track and adds it to the end of your queue without interrupting the current song.
 
@@ -16,23 +16,23 @@ TrackBridge only controls the queue and playback in your own Spotify player; it 
 
 ## Screenshots
 
-TrackBridge **1.11.0**, shown with demonstration data.
+TrackBridge 1.14.0 with test data where shown.
 
-### Overview
+### Overview and setup
 
-![Overview](../assets/interface-overview-1.11.0-en.png)
+![Overview](../assets/overview-1.14.0-en.png)
 
-### Queue and history cleanup
+![Setup wizard](../assets/wizard-1.14.0-en.png)
 
-![Queue and history cleanup](../assets/interface-queue-1.11.0-en.png)
+### History and request review
 
-### Moderation
+![Search and status filters](../assets/history-1.14.0-en.png)
 
-![Moderation](../assets/interface-moderation-1.11.0-en.png)
+![Request review card](../assets/review-1.14.0-en.png)
 
-### About and GitHub
+### Offline demo
 
-![About and GitHub](../assets/interface-about-1.11.0-en.png)
+![Offline demo scenarios](../assets/demo-1.14.0-en.png)
 
 ## Custom notification sound
 
@@ -40,7 +40,7 @@ In Settings, choose **Choose audio…** to import an MP3 or another format suppo
 
 The converted copy is stored in `data`, so moving the original file does not break your sound. Volume applies to both custom and built-in sounds. Use **Default sound** to restore the original chime. If a saved sound becomes unavailable, the built-in chime is used.
 
-![Custom sound controls](../assets/interface-settings-1.11.0-en.png)
+![Custom sound controls](../assets/settings-1.14.0-en.png)
 
 ## Sound notifications
 
@@ -55,23 +55,25 @@ A short, quiet two-note chime plays after Spotify confirms a viewer's track was 
 - Duplicate prevention and manual resolution of uncertain playback requests.
 - System tray support and Windows DPAPI protection for stored tokens.
 - Automatic GitHub release checks, verified downloads and restart-to-install updates.
-- Russian and English UI. Use the RU/EN buttons in the sidebar; changes apply immediately and are saved. Account IDs and custom reward titles are preserved. Earlier log entries stay in their original language. New chat notifications use the selected language.
+- Russian and English UI. Choose a language in Settings; changes apply immediately and are saved. Account IDs and custom reward titles are preserved. Earlier log entries stay in their original language. New chat notifications use the selected language.
 
 ## Download
 
-[Download TrackBridge.exe](https://github.com/Rub1nchik702/TrackBridge/releases/download/v1.13.1/TrackBridge.exe) directly, save it to a writable folder, and run it. To update an existing installation, close TrackBridge and replace `TrackBridge.exe` in the same folder so the app can keep using your `data` folder.
+[Download TrackBridge.exe](https://github.com/Rub1nchik702/TrackBridge/releases/latest/download/TrackBridge.exe) directly, save it to a writable folder, and run it. To update an existing installation, close TrackBridge and replace `TrackBridge.exe` in the same folder so the app can keep using your `data` folder.
 
 Requires Windows 10/11, Spotify Premium and an active Spotify player. Your Twitch channel must support custom Channel Points rewards. The executable has no Windows code-signing certificate. Public-source builds use no obfuscation.
 
 ## Setup
 
-Screenshots below show TrackBridge 1.9.0.2 with demonstration data. Replace the example Client IDs with your own; the images do not show real accounts or authorization tokens.
+On **Overview**, open **Setup wizard** in the readiness card and follow the Twitch, Spotify, Reward and Player steps. After the final check, choose **Finish** to return to Overview. Start request reception when you're ready. **Demo mode** on Overview lets you practice first with test orders.
+
+The manual instructions below include the developer app fields and example screens.
 
 ### 1. Open Settings
 
 Run the downloaded `TrackBridge.exe`, choose **English** in **Settings** if needed, and go to **Connections**.
 
-![Step 1 — open Settings](../assets/setup-step-1-en.png)
+![Connections in Settings](../assets/settings-1.14.0-en.png)
 
 ### 2. Register the developer apps and connect your accounts
 
@@ -91,7 +93,7 @@ Example Spotify form with the name, description, project website and redirect UR
 
 Select **Web API**. Read Spotify's terms, accept them yourself, and click **Save**:
 
-Save the app and copy its **Client ID**. In TrackBridge, paste it into **Spotify Client ID**, click **Connect Spotify**, and approve access in the browser. Keep TrackBridge open until the browser returns to its local callback. A Client Secret is not needed. Spotify Premium is required; if the developer dashboard requires an allowed-user entry, add the Spotify account you will connect. See [Spotify app setup](https://developer.spotify.com/documentation/web-api/concepts/apps) and [redirect URI requirements](https://developer.spotify.com/documentation/web-api/concepts/redirect_uri).
+Save the app and copy its **Client ID**. In TrackBridge, paste it into **Spotify Client ID**, click **Connect** next to Spotify Client ID, and approve access in the browser. Keep TrackBridge open until the browser returns to its local callback. A Client Secret is not needed. Spotify Premium is required; if the developer dashboard requires an allowed-user entry, add the Spotify account you will connect. See [Spotify app setup](https://developer.spotify.com/documentation/web-api/concepts/apps) and [redirect URI requirements](https://developer.spotify.com/documentation/web-api/concepts/redirect_uri).
 
 Then open the [Twitch Developer Console](https://dev.twitch.tv/console/apps), sign in as the channel owner, and register an application:
 
@@ -106,9 +108,7 @@ Example Twitch form: select **Application Integration** and **Public**. Use an a
 
 ![Twitch app creation — name, redirect URL, category and Public client type](../assets/setup-twitch-create-app-en.jpg)
 
-Copy its **Client ID** into **Twitch Client ID**, click **Connect Twitch**, and follow the browser instructions to authorize the channel owner's account. Allow the requested chat access so song replies and refund notifications can work. If a device code is shown, enter that current code on Twitch's activation page. See [Twitch app registration](https://dev.twitch.tv/docs/authentication/register-app) and [Device Code Flow](https://dev.twitch.tv/docs/authentication/getting-tokens-oauth/#device-code-grant-flow).
-
-![Step 2 — Client ID fields and account connection buttons](../assets/setup-step-2-en.png)
+Copy its **Client ID** into **Twitch Client ID**, click **Connect** next to Twitch Client ID, and follow the browser instructions to authorize the channel owner's account. Allow the requested chat access so song replies and refund notifications can work. If a device code is shown, enter that current code on Twitch's activation page. See [Twitch app registration](https://dev.twitch.tv/docs/authentication/register-app) and [Device Code Flow](https://dev.twitch.tv/docs/authentication/getting-tokens-oauth/#device-code-grant-flow).
 
 ### 3. Create or choose a Channel Points reward
 
@@ -116,13 +116,9 @@ In **Settings → Twitch reward**, enter a reward name and points cost, then cli
 
 If configuring the reward in Twitch, require text input so viewers can paste links, and keep redemptions in the request queue. Rewards created by a different developer app cannot be managed by this Client ID. Your Twitch channel must support custom Channel Points rewards.
 
-![Step 3 — choose the reward](../assets/setup-step-3-en.png)
-
 ### 4. Start Spotify and enable requests
 
-Open Spotify and play a track on the device you want to use. Return to **Overview** in TrackBridge and click **Start**. Wait for **Requests active · Twitch connected** before viewers use the selected reward.
-
-![Step 4 — Overview with active requests](../assets/setup-step-4-en.png)
+Open Spotify and play a track on the device you want to use. Return to **Overview** in TrackBridge and click **Start**. Wait for **Receiving requests** before viewers use the selected reward.
 
 Viewers can submit a Spotify track link, a YouTube link or a YouTube Music link. TrackBridge resolves supported video links to Spotify tracks and appends accepted requests to the Spotify queue. Keep both Spotify and TrackBridge running. Connecting accounts alone does not start request handling. Each broadcaster supplies their own developer application IDs.
 

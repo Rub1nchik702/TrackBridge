@@ -1,4 +1,12 @@
-# Изменения
+# Changelog
+
+## 1.14.0
+
+- Added a four-step setup wizard and a readiness card for Twitch, Spotify, the Channel Points reward and the player.
+- Added a request review card with the original link, reason, refund countdown and actions for manual track selection or a refund.
+- Added viewer and track search and a status filter to request history.
+- Added an offline demo for a successful request, points refund and manual track selection.
+- Added connection instructions and a configurable per-viewer request limit.
 
 ## 1.13.1
 

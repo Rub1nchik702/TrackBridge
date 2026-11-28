@@ -25,6 +25,9 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
         with:
           persist-credentials: false
+      - name: Run Rust tests
+        shell: powershell
+        run: cargo test --release --locked --manifest-path rust/Cargo.toml
       - name: Compile and package Windows application
         shell: powershell
         run: .\build.ps1

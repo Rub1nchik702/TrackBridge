@@ -2,17 +2,27 @@
 
 # TrackBridge
 
-**Windows · 1.13.1 · by Rub1nchik**
+**Windows · 1.14.0 · by Rub1nchik**
 
 **English** · [Русский](README.ru.md)
 
 Twitch Channel Points song requests → your Spotify queue. Viewers submit a link; TrackBridge adds a matching Spotify track without interrupting the current song.
 
-**[Download TrackBridge.exe](https://github.com/Rub1nchik702/TrackBridge/releases/download/v1.13.1/TrackBridge.exe)** · **[Setup with screenshots](https://github.com/Rub1nchik702/TrackBridge/blob/main/docs/GUIDE.md#setup)** · [Report a problem](https://github.com/Rub1nchik702/TrackBridge/issues/new/choose)
+**[Download TrackBridge.exe](https://github.com/Rub1nchik702/TrackBridge/releases/latest/download/TrackBridge.exe)** · **[Setup with screenshots](https://github.com/Rub1nchik702/TrackBridge/blob/main/docs/GUIDE.md#setup)** · [Report a problem](https://github.com/Rub1nchik702/TrackBridge/issues/new/choose)
 
-![Overview](assets/overview-1.13.1-en.png)
+![Overview with request readiness](assets/overview-1.14.0-en.png)
 
-![Settings](assets/settings-1.13.1-en.png)
+## What's new in 1.14.0
+
+- **Setup wizard** walks through Twitch, Spotify, the Channel Points reward and the final player check.
+- **Request readiness** on Overview shows which connection or setting needs attention and what to do next.
+- **Request review** shows the original link, the reason and any refund countdown. Choose a Spotify track or refund the points from the card.
+- **History search** matches viewer names and track titles as you type. Combine it with a status filter.
+- **Offline demo** lets you practice a successful request, a refund and manual track selection with disposable test orders.
+
+![Setup wizard](assets/wizard-1.14.0-en.png)
+
+See the [latest screenshots](docs/GUIDE.md#screenshots) for history, request review, the demo and Settings.
 
 ## Features
 
@@ -26,8 +36,8 @@ Twitch Channel Points song requests → your Spotify queue. Viewers submit a lin
 ## Get started
 
 1. Download `TrackBridge.exe`, save it to a writable folder, and run it.
-2. In **Settings**, connect your Spotify and Twitch developer apps and select or create a reward. Follow the [illustrated guide](https://github.com/Rub1nchik702/TrackBridge/blob/main/docs/GUIDE.md#setup) for the exact fields.
-3. Start Spotify playback, open **Overview** and click **Start**. Wait for **Requests active**.
+2. On **Overview**, open **Setup wizard** from the readiness card. Connect Twitch and Spotify, select or create a reward, and check your Spotify player. See the [setup guide](docs/GUIDE.md#setup) for the developer app fields.
+3. Return to **Overview** and choose **Start**. Wait for **Receiving requests**.
 
 Requires Windows 10/11, Spotify Premium and a Twitch channel with custom Channel Points rewards. Each broadcaster uses their own developer app Client IDs.
 
@@ -41,7 +51,6 @@ Check request rows, then click **Hide selected** to hide them from the list. Thi
 
 Keep the `data` folder when updating manually; it contains your settings and account access. Do not share it. Automatic updates verify the publisher signature and SHA-256.
 
-In 1.13.1 a failed chat notification leaves a confirmed refund final even when the order history is full.
 
 ## Source, rights and support
 
